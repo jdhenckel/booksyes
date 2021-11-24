@@ -1,0 +1,32 @@
+.search {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    row-gap: 1em;
+    background-color: rgb(243, 243, 218);
+}
+
+.search .category {
+    width: fit-content;
+    align-self: center;
+}
+
+.search .gobutton {
+    background: url("./go.gif");
+    width: 33px;
+    height: 22px;
+    border: 0px;
+}
+
+.search .specialsearch {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    width: 100%;
+    gap: 3em;
+}
+
+.search .infotext {
+    width: 50%;
+}
