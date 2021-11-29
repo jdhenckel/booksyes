@@ -10,19 +10,18 @@ class Catalog extends Component {
         }
     }
 
+    componentWillReceiveProps(nextProps) {
+        this.setState({ books: nextProps.books });  
+    }
     
 
     render() {
         return(
             <div className="catalog">
                 <ul>
-                    {/*{this.state.books.map((b) => (
-                        <BookEntry key={b} book={b}></BookEntry>
-                    ))}*/}
-                    <BookEntry></BookEntry>
-                    <BookEntry></BookEntry>
-                    <BookEntry></BookEntry>
-                    <BookEntry></BookEntry>
+                    {this.state.books.map((b) => (
+                        <BookEntry key={b.id} book={b}></BookEntry>
+                    ))}
                 </ul>
                 
             </div>

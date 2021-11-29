@@ -1,0 +1,19 @@
+// from https://daily.dev/blog/how-to-debug-netlify-serverless-lambda-functions-using-vs-code
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Netlify Debugging",
+        "type": "pwa-node",
+        "request": "launch",
+        "program": "${workspaceFolder}\\node_modules\\.bin\\netlify",
+        "runtimeArgs": ["run-script", "debug"],
+        "runtimeExecutable": "npm",
+        "skipFiles": ["<node_internals>/**"],
+        "resolveSourceMapLocations": [
+            "${workspaceFolder}/**",
+            "!**/node_modules/**"
+        ]
+      }
+    ]
+  }
