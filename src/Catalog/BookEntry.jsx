@@ -6,7 +6,21 @@ class BookEntry extends Component {
     constructor(props) {
         super (props);
         this.state = {
-            book: props.book ?? {},
+            book: props.book ?? {
+                author: "Barker, Cicely Mary.",
+                title: "FLOWER FAIRIES OF THE SPRING.",
+                price: "5",
+                isNew: false,
+                imageSrc: "http://hosting.photobucket.com/images/g478/booksyes/DSC_7150.JPG",
+                description:"Frederick Warne 1923, 2018. Hardcover with dust jacket. Ill. by Barker. 0723237530. Brand-New.",
+                ISBN: "0723237530",
+            },
+
+            isbnImageLink: "",
+        }
+
+        if(this.state.book.ISBN) {
+            this.state.isbnImageLink = "http://images.amazon.com/images/P/" + this.state.book.ISBN + ".01.THUMBZZZ.jpg";
         }
     }
 
@@ -14,21 +28,18 @@ class BookEntry extends Component {
         return(
             <div className="bookentry">
                 <div><input type="checkbox" name="13" value="x" /></div>
-                <div>
-                    <a href="isbn.cgi?a=0723237530" target="blank" title="Click to view picture in a new window">
-                        <img src="http://images.amazon.com/images/P/0723237530.01.THUMBZZZ.jpg" /></a>
-                </div>
+                <div>{this.state.book.ISBN && <img src={this.state.isbnImageLink} />}</div>
                 <div className="main">
-                    <img src={newImage} />
-                    <span className="author">Barker, Cicely Mary.</span>
-                    <span className="title">FLOWER FAIRIES OF THE SPRING. </span>
-                    Frederick Warne 1923, 2018. Hardcover with dust jacket. Ill. by Barker. 0723237530. Brand-New.
-                    <span className="price">$5.</span>
+                    {this.state.book.isNew && <img src={newImage} />}
+                    <span className="author">{this.state.book.author}</span>
+                    <span className="title">{this.state.book.title}</span>
+                    {this.state.book.description}
+                    <span className="price">${this.state.book.price}</span>
                 </div>
                 <div>
                     <div className="caption">photo of the actual item</div>
-                    <a href="pics.cgi?open=new_window&amp;p=i,DSC_7150" target="blank" title="Click to view pictures in a new window">
-                        <img src="http://hosting.photobucket.com/images/g478/booksyes/DSC_7150.JPG" border="0" height="90" /></a>
+                    <a href={this.state.book.imageSrc} target="_blank" rel="noopener noreferrer" title="Click to view pictures in a new window">
+                        <img src={this.state.book.imageSrc} border="0" height="90" /></a>
                 </div>
             </div>
         );
