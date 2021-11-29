@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Catalog from '../Catalog/Catalog';
 import './Search.css';
 
 class Search extends Component {

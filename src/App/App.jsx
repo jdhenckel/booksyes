@@ -9,7 +9,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showCatalog: false,
+      showCatalog: true,
       books: []
     }
   }
@@ -19,8 +19,10 @@ class App extends Component {
     console.log("app got the search data: " + searchData);
     var params = {query: searchData};
     var url = "/.netlify/functions/search";
-    var response = axios.get(url, params);
-    console.log(response);
+    axios.get(url, params).then(response => {
+      console.log(response.data);
+      //get data and fill catalog
+    });
   };
 
   async getDataAxios(url, p){
