@@ -15,36 +15,21 @@ class BookEntry extends Component {
                 imageSrc: "http://hosting.photobucket.com/images/g478/booksyes/DSC_7150.JPG",
                 description:"Frederick Warne 1923, 2018. Hardcover with dust jacket. Ill. by Barker. 0723237530. Brand-New.",
                 ISBN: "0723237530",
-                dataAdded: "",
-            },
-
-            isbnImageLink: "",
+            }
         }
-
-        this.updateProps(props);
     }
 
     componentWillReceiveProps(nextProps) {
-        this.updateProps(nextProps);
+        this.setState({book: nextProps.book});
     }
-
-    updateProps = (props) => {
-        var newprops = props;
-        if(newprops.book.ISBN) {
-            newprops.isbnImageLink = "http://images.amazon.com/images/P/" + newprops.book.ISBN + ".01.THUMBZZZ.jpg";
-        }
-
-        newprops.book.isNew = newprops.book.isNew == "true"; //seems hacky but it isn't
-        this.setState({ book: newprops.book, isbnImageLink: newprops.isbnImageLink });
-    };
 
     render() {
         return(
             <div className="bookentry">
                 <div><input type="checkbox" name="13" value="x" /></div>
-                <div>{this.state.book.ISBN && <img src={this.state.isbnImageLink} />}</div>
+                <div>{this.state.book.ISBN && <img src={"http://images.amazon.com/images/P/" + this.state.book.ISBN + ".01.THUMBZZZ.jpg"} />}</div>
                 <div className="main">
-                    {this.state.book.isNew && <img src={newImage} />}
+                    {this.state.book.isNew == "true" && <img src={newImage} />}
                     <span className="author">{this.state.book.author} </span>
                     <span className="title">{this.state.book.title} </span>
                     {this.state.book.description} 

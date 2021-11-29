@@ -23,11 +23,13 @@ class Search extends Component {
 
     searchRecent = (e) => {
         e.preventDefault();
+        this.props.recentCallback();
         console.log('You clicked recent.');
     }
 
     searchPhoto = (e) => {
         e.preventDefault();
+        this.props.hasPhotoCallback();
         console.log('You clicked photos.');
     }
 
@@ -35,12 +37,18 @@ class Search extends Component {
         this.setState({searchTerm: e.target.value});
     }
 
+    _handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            this.props.searchCallback(this.state.searchTerm);
+        }
+    }
+
     render() {
         return (
             <div>
                 <div className="search">
                     <div>
-                        <input type="text" className="field" placeholder="Search for" onChange={this.onChange} value={this.state.searchTerm}></input>
+                        <input type="text" className="field" placeholder="Search for" onChange={this.onChange} onKeyDown={this._handleKeyDown} value={this.state.searchTerm}></input>
                         <button className="gobutton" onClick={this.searchFor}></button>
                     </div>
                     <button className="category" onClick={this.browseCategories}>Browse By Category</button>

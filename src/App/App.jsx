@@ -9,13 +9,29 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showCatalog: false,
-      books: []
+      books: [],
+      loading: false,
     }
   }
 
+  startLoading = () => {
+    this.setState(() => {
+      return {
+        loading: true,
+      }
+    })
+  }
+
+  stopLoading = () => {
+    this.setState(() => {
+      return {
+        loading: false,
+      }
+    })
+  }
+
   handleSearch = (searchData) => {
-    //todo seach
+    this.startLoading();
     console.log("app got the search data: " + searchData);
     var url = "/.netlify/functions/search";
     axios.get(url, {
@@ -27,12 +43,44 @@ class App extends Component {
       this.setState((state, props) => {
         return {
           books: response.data.books,
-          showCatalog: true,
         };
       });
-      //get data and fill catalog
+    }).finally(() => {
+      this.stopLoading();
     });
   };
+
+  getRecent = () => {
+    this.startLoading();
+    var url = "/.netlify/functions/new";
+    axios.get(url).then(response => {
+      console.log(response.data);
+      this.setState((state, props) => {
+        return {
+          books: response.data.books,
+        };
+      });
+    }).finally(() => {
+      this.stopLoading();
+    });
+  };
+
+  getWithPhoto = () => {
+    this.startLoading();
+    var url = "/.netlify/functions/hasphoto";
+    axios.get(url).then(response => {
+      console.log(response.data);
+      this.setState((state, props) => {
+        return {
+          books: response.data.books,
+        };
+      });
+    }).finally(() => {
+      this.stopLoading();
+    });
+  };
+
+
 
   render() {
     return (
@@ -43,9 +91,10 @@ class App extends Component {
         <h3>17105 Nowthen Blvd., Anoka, MN 55303</h3>
         <h3>763-753-3429</h3>
         <hr/>
-        <h3>Used, collectible, and out-of-print books -- good books -- for children and young people of all ages!</h3>        
-        <Search searchCallback = {this.handleSearch}></Search>
-        {this.state.showCatalog && <Catalog books={this.state.books}></Catalog>}
+        <h3>Used, collectible, and out-of-print books -- good books -- for children and young people of all ages!</h3>
+        <Search searchCallback={this.handleSearch} recentCallback={this.getRecent} hasPhotoCallback={this.getWithPhoto}></Search>
+        {this.state.loading && <div className="loader"><div className="dot-pulse"></div></div>}
+        <Catalog books={this.state.books}></Catalog>
         <hr/>
         <small><a className="about" href="">About Us</a> | <a href="mailto:bigt40@aol.com">email Jan</a> | <a href="mailto:jdhenckel@gmail.com">email webmaster</a></small>
         <hr/>
