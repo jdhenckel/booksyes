@@ -1,26 +1,8 @@
 //called with /.netlify/functions/search
 const axios = require('axios');
+const helpers = require('./helperFuncs.js');
 
 exports.handler = async function(event, context) {
-
-    buildBooks = (data) => {
-        const table = JSON.parse(data).table;
-        const retObj = {books: []};
-        for (let r = 0; r < table.rows.length; r++) {
-            const row = table.rows[r];
-            const book = {id: r};
-
-            for (let i = 0; i < table.cols.length; i++) {
-                const col = table.cols[i];
-                const valueSet = JSON.parse('{"' + col.label + '": "' + (row.c[i]?.f ?? row.c[i]?.v) + '"}');
-                Object.assign(book, valueSet);
-            }
-
-            retObj.books.push(book);
-        }
-
-        return JSON.stringify(retObj);
-    };
 
     buildQuery = (searchTerms) => {
         const terms = searchTerms.split(" ");
@@ -31,24 +13,18 @@ exports.handler = async function(event, context) {
                 queryString += "or ";
             }
             const term = terms[i].toLowerCase();
-            queryString += 'where "search" contains "' + term + '" ';
+            queryString += 'where A contains "' + term + '" ';
         }
 
         return queryString;
     };
 
-    const {DATABASE_LOCATION} = process.env;
-//https://docs.google.com/spreadsheets/d/1fMRI2ZURf6op-fd3SYvv-BKKdMvO4O5nre9xUFObU5c/gviz/tq?tq=select%20*
-    const request = "/gviz/tq?tq=";
-    const query = buildQuery(event.queryStringParameters.query ?? "");
-    
-    const endpoint = DATABASE_LOCATION + request + query;
+    const endpoint = helpers.buildURL(buildQuery(event.queryStringParameters.query ?? ""));
 
     return axios.get(endpoint, {headers: {'X-DataSource-Auth':""}})
-    .then(response => response.data)
-    .then(data => ({
+    .then(response => ({
         statusCode: 200,
-        body: buildBooks(data.replace(/^\)]\}'\n/, '')),
+        body: helpers.buildBooks(response.data),
     }))
     .catch((error) => ({ statusCode: 422, body: String(error) }));
 }

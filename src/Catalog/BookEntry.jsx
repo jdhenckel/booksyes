@@ -21,14 +21,22 @@ class BookEntry extends Component {
             isbnImageLink: "",
         }
 
-        if(this.state.book.ISBN) {
-            this.state.isbnImageLink = "http://images.amazon.com/images/P/" + this.state.book.ISBN + ".01.THUMBZZZ.jpg";
-        }
+        this.updateProps(props);
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({ book: nextProps.book });  
+        this.updateProps(nextProps);
     }
+
+    updateProps = (props) => {
+        var newprops = props;
+        if(newprops.book.ISBN) {
+            newprops.isbnImageLink = "http://images.amazon.com/images/P/" + newprops.book.ISBN + ".01.THUMBZZZ.jpg";
+        }
+
+        newprops.book.isNew = newprops.book.isNew == "true"; //seems hacky but it isn't
+        this.setState({ book: newprops.book, isbnImageLink: newprops.isbnImageLink });
+    };
 
     render() {
         return(
@@ -39,7 +47,7 @@ class BookEntry extends Component {
                     {this.state.book.isNew && <img src={newImage} />}
                     <span className="author">{this.state.book.author} </span>
                     <span className="title">{this.state.book.title} </span>
-                    {this.state.book.description} {this.state.book.dateAdded}
+                    {this.state.book.description} 
                     <span className="price"> ${this.state.book.price} </span>
                 </div>
                 <div>
