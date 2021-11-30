@@ -13,7 +13,7 @@
   overflow: hidden;
 }
 
-button .linklike {
+button.linklike {
   background: none!important;
   border: none;
   padding: 0!important;
