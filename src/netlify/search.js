@@ -19,7 +19,7 @@ exports.handler = async function(event, context) {
         return queryString;
     };
 
-    const endpoint = helpers.buildURL(buildQuery(event.queryStringParameters.query ?? ""));
+    const endpoint = helpers.buildURL(buildQuery(event.queryStringParameters.query ?? ""), "books");
 
     return axios.get(endpoint, {headers: {'X-DataSource-Auth':""}})
     .then(response => ({

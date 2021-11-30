@@ -10,7 +10,10 @@ class App extends Component {
     super(props);
     this.state = {
       books: [],
+      categories: [],
       loading: false,
+      showCatalog: false,
+      showCategories: false,
     }
   }
 
@@ -30,53 +33,78 @@ class App extends Component {
     })
   }
 
-  handleSearch = (searchData) => {
+  handleRequest = (url, query, onReturn) => {
     this.startLoading();
-    console.log("app got the search data: " + searchData);
-    var url = "/.netlify/functions/search";
-    axios.get(url, {
+    axios.get("/.netlify/functions/" + url, {
       params: {
-        query: searchData.toString()
+        query: query?.toString()
       }
     }).then(response => {
       console.log(response.data);
-      this.setState((state, props) => {
-        return {
-          books: response.data.books,
-        };
-      });
+      onReturn(response.data);
     }).finally(() => {
       this.stopLoading();
+    });
+  }
+
+  populateCatelog = (books) => {
+    this.setState((state, props) => {
+      return {
+        showCatalog: true,
+        showCategories: false,
+        books: books,
+      };
+    });
+  };
+
+  categoryCallBack = () => {
+    this.setState((state, props) => {
+      return {
+        showCatalog: false,
+      };
+    });
+
+    if(this.state.categories.length !== 0) {
+      this.setState((state, props) => {
+        return {
+          showCategories: true,
+        };
+      });
+
+      return;
+    }
+
+    this.handleRequest("categories", null, (data) => {
+      this.setState((state, props) => {
+        return {
+          showCategories: true,
+          categories: data.categories,
+        };
+      });
+    });
+  }
+
+  pickCategory = (category) => {
+    this.handleRequest("bycategory", category, (data) => {
+      this.populateCatelog(data.books); 
+    });
+  }
+
+  handleSearch = (searchData) => {
+    this.handleRequest("search", searchData, (data) => {
+      this.populateCatelog(data.books);
     });
   };
 
   getRecent = () => {
-    this.startLoading();
-    var url = "/.netlify/functions/new";
-    axios.get(url).then(response => {
-      console.log(response.data);
-      this.setState((state, props) => {
-        return {
-          books: response.data.books,
-        };
-      });
-    }).finally(() => {
-      this.stopLoading();
+    this.handleRequest("new", null, (data) => {
+      this.populateCatelog(data.books);
     });
   };
 
   getWithPhoto = () => {
-    this.startLoading();
-    var url = "/.netlify/functions/hasphoto";
-    axios.get(url).then(response => {
-      console.log(response.data);
-      this.setState((state, props) => {
-        return {
-          books: response.data.books,
-        };
-      });
-    }).finally(() => {
-      this.stopLoading();
+    this.handleRequest("hasphoto", null, (data) => {
+      this.populateCatelog(data.books);
     });
   };
 
@@ -92,9 +120,18 @@ class App extends Component {
         <h3>763-753-3429</h3>
         <hr/>
         <h3>Used, collectible, and out-of-print books -- good books -- for children and young people of all ages!</h3>
-        <Search searchCallback={this.handleSearch} recentCallback={this.getRecent} hasPhotoCallback={this.getWithPhoto}></Search>
+        <Search searchCallback={this.handleSearch} recentCallback={this.getRecent} hasPhotoCallback={this.getWithPhoto} categoriesCallBack={this.categoryCallBack}></Search>
         {this.state.loading && <div className="loader"><div className="dot-pulse"></div></div>}
-        <Catalog books={this.state.books}></Catalog>
+        {this.state.showCatalog && <Catalog books={this.state.books}></Catalog>}
+        {this.state.showCategories && <div className="categories">
+          <ul>
+            {this.state.categories.map((c, i) => (
+              <li key={i}>
+                <button onClick={() => this.pickCategory(c)}>{c}</button>
+              </li>
+            ))}
+          </ul>
+        </div>}
         <hr/>
         <small><a className="about" href="">About Us</a> | <a href="mailto:bigt40@aol.com">email Jan</a> | <a href="mailto:jdhenckel@gmail.com">email webmaster</a></small>
         <hr/>

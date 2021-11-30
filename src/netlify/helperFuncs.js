@@ -17,9 +17,25 @@ exports.buildBooks = (data) => {
     return JSON.stringify(retObj);
 };
 
-exports.buildURL = (query) => {
+exports.buildURL = (query, sheet) => {
+    const {DATABASE_SHEET_BOOKS} = process.env;
+    const {DATABASE_SHEET_CATEGORIES} = process.env;
     const {DATABASE_LOCATION} = process.env;
-    const request = "/gviz/tq?tq=";    
-    const endpoint = DATABASE_LOCATION + request + query;
+    const {DATABASE_KEY} = process.env;
+    
+    var id;
+    switch(sheet) {
+        case "books":
+            id = DATABASE_SHEET_BOOKS;
+            break;
+        case "categories":
+            id = DATABASE_SHEET_CATEGORIES;
+            break;
+    }
+
+    const key = "&key=" + DATABASE_KEY;
+    const gid = "&gid=" + id;
+    const request = "&tq=" + query;
+    const endpoint = DATABASE_LOCATION + "tq?" + request + key + gid;
     return endpoint;
 };

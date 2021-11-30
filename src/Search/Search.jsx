@@ -19,6 +19,7 @@ class Search extends Component {
     browseCategories = (e) => {
         e.preventDefault();
         console.log('You clicked categories.');
+        this.props.categoriesCallBack();
     }
 
     searchRecent = (e) => {
