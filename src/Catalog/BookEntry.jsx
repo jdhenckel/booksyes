@@ -7,20 +7,29 @@ class BookEntry extends Component {
     constructor(props) {
         super (props);
         this.state = {
-            book: props.book ?? {
-                author: "Barker, Cicely Mary.",
-                title: "FLOWER FAIRIES OF THE SPRING.",
-                price: "5",
-                isNew: false,
-                imageSrc: "http://hosting.photobucket.com/images/g478/booksyes/DSC_7150.JPG",
-                description:"Frederick Warne 1923, 2018. Hardcover with dust jacket. Ill. by Barker. 0723237530. Brand-New.",
-                ISBN: "0723237530",
-            }
+            book: props.book ?? {},
+            imageLinks: [],
         }
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({book: nextProps.book});
+        const links = this.makeImageLinks(nextProps.book.imageSrc);
+        this.setState({
+            book: nextProps.book,
+            imageLinks: links,
+        });
+    }
+
+    makeImageLinks = (imageSrc) => {
+        var imageLinks = [];
+        const names = imageSrc.split(',');
+    
+        for (let i = 0; i < names.length; i++) {
+            const element = names[i];
+            imageLinks.push('http://i1103.photobucket.com/albums/g478/booksyes/' + element + ".jpg");
+        }
+    
+        return imageLinks;
     }
 
     render() {
@@ -37,8 +46,8 @@ class BookEntry extends Component {
                 </div>
                 <div>
                     <div className="caption">photo of the actual item</div>
-                    <a className={this.state.book.imageSrc === "undefined" ? "inactiveLink" : ""} href={this.state.book.imageSrc === "undefined" ? "" : this.state.book.imageSrc} target="_blank" rel="noopener noreferrer" title="Click to view pictures in a new window">
-                    <img src={this.state.book.imageSrc !== "undefined" ? this.state.book.imageSrc : noImage} border="0" height="90" alt="actual book cover"/></a>
+                    <a className={this.state.imageLinks[0] ? "" : "inactiveLink"} href={this.state.imageLinks[0] ? this.state.imageLinks[0] : "" } target="_blank" rel="noopener noreferrer" title="Click to view pictures in a new window">
+                    <img src={this.state.imageLinks[0] ? this.state.imageLinks[0] : noImage} onError={(e) => {e.target.onerror = null; e.target.src=noImage}} border="0" height="90" alt="actual book cover"/></a>
                 </div>
             </div>
         );
