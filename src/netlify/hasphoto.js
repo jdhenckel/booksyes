@@ -4,7 +4,7 @@ const helpers = require('./helperFuncs.js');
 
 exports.handler = async function(event, context) {
 
-    const endpoint = helpers.buildURL('select * where C is not null', "books");
+    const endpoint = helpers.buildURL('select * where ' + helpers.imageCol + ' is not null', "books");
 
     return axios.get(endpoint, {headers: {'X-DataSource-Auth':""}})
     .then(response => ({

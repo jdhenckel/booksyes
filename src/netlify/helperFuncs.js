@@ -1,3 +1,8 @@
+exports.searchCol = "A";
+exports.categoryCol = "J";
+exports.imageCol = "I";
+exports.isNewCol = "B";
+
 exports.buildBooks = (data) => {
     const table = JSON.parse(data.replace(/^\)]\}'\n/, '')).table;
     const retObj = {books: []};

@@ -13,7 +13,7 @@ exports.handler = async function(event, context) {
                 queryString += "or ";
             }
             const term = terms[i].toLowerCase();
-            queryString += 'where A contains "' + term + '" ';
+            queryString += 'where ' + helpers.searchCol + ' contains "' + term + '" ';
         }
 
         return queryString;

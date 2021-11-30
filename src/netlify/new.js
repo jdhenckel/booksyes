@@ -4,7 +4,7 @@ const helpers = require('./helperFuncs.js');
 
 exports.handler = async function(event, context) {
 
-    const endpoint = helpers.buildURL('select * where B = true', "books");
+    const endpoint = helpers.buildURL('select * where ' + helpers.searchCol + ' = true', "books");
 
     return axios.get(endpoint, {headers: {'X-DataSource-Auth':""}})
     .then(response => ({
