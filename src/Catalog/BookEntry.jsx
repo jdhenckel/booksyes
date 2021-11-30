@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import "./BookEntry.scss";
+import "./BookEntry.css";
 import newImage from "./new.gif";
 import noImage from "./noImage.jpg";
 
