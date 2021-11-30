@@ -8,12 +8,14 @@ exports.handler = async function(event, context) {
         const terms = searchTerms.split(" ");
         var queryString = "select * ";
         if(searchTerms == "") return queryString;
+        queryString += 'where ';
+
         for (let i = 0; i < terms.length; i++) {
             if(i != 0 && i < terms.length) { //not the first or last
-                queryString += "or ";
+                queryString += "and ";
             }
             const term = terms[i].toLowerCase();
-            queryString += 'where ' + helpers.searchCol + ' contains "' + term + '" ';
+            queryString += helpers.searchCol + ' contains "' + term + '" ';
         }
 
         return queryString;
