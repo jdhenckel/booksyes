@@ -13,6 +13,15 @@
   overflow: hidden;
 }
 
+button .linklike {
+  background: none!important;
+  border: none;
+  padding: 0!important;
+  color: #069;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 /**
  * ==============================================
  * Dot Pulse

@@ -27,7 +27,7 @@ class BookEntry extends Component {
         return(
             <div className="bookentry">
                 <div><input type="checkbox" name="13" value="x" /></div>
-                <div>{this.state.book.ISBN && <img src={"http://images.amazon.com/images/P/" + this.state.book.ISBN + ".01.THUMBZZZ.jpg"} alt="unable to load image from amazon"/>}</div>
+                <div>{this.state.book.ISBN && <img src={"http://images.amazon.com/images/P/" + this.state.book.ISBN + ".01.THUMBZZZ.jpg"} alt="example Book cover"/>}</div>
                 <div className="main">
                     {this.state.book.isNew === "true" && <img src={newImage} alt="new!"/>}
                     <span className="author">{this.state.book.author} </span>
@@ -38,7 +38,7 @@ class BookEntry extends Component {
                 <div>
                     <div className="caption">photo of the actual item</div>
                     <a className={this.state.book.imageSrc === "undefined" ? "inactiveLink" : ""} href={this.state.book.imageSrc === "undefined" ? "" : this.state.book.imageSrc} target="_blank" rel="noopener noreferrer" title="Click to view pictures in a new window">
-                    <img src={this.state.book.imageSrc !== "undefined" ? this.state.book.imageSrc : noImage} border="0" height="90" alt="book image"/></a>
+                    <img src={this.state.book.imageSrc !== "undefined" ? this.state.book.imageSrc : noImage} border="0" height="90" alt="actual book cover"/></a>
                 </div>
             </div>
         );

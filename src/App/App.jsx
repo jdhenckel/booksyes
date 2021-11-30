@@ -133,7 +133,7 @@ class App extends Component {
           </ul>
         </div>}
         <hr/>
-        <small><a className="about" href="">About Us</a> | <a href="mailto:bigt40@aol.com">email Jan</a> | <a href="mailto:jdhenckel@gmail.com">email webmaster</a></small>
+        <small><button className="about linklike">About Us</button> | <a href="mailto:bigt40@aol.com">email Jan</a> | <a href="mailto:jdhenckel@gmail.com">email webmaster</a></small>
         <hr/>
         <small>This way-cool web site developed by <a href="www.poorfox.com">poorfox</a>.</small>
       </div>
