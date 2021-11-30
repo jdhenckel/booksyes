@@ -53,7 +53,7 @@ class Search extends Component {
                         <button className="gobutton" onClick={this.searchFor}></button>
                     </div>
                     <button className="category" onClick={this.browseCategories}>Browse By Category</button>
-                    <small className="specialsearch"><a href="" onClick={this.searchRecent}>Find Recent Additions</a> <a href="" onClick={this.searchPhoto}>Find Books with a Photo</a></small>
+                    <small className="specialsearch"><a href="#" onClick={this.searchRecent}>Find Recent Additions</a> <a href="#" onClick={this.searchPhoto}>Find Books with a Photo</a></small>
                     <small className="infotext">To search the catalog for a word or phrase, type it in the Search field and click on the GO! button.
     To view the entire catalog, leave the Search field blank. To load the entire catalog takes about five minutes if you are using a slow connection.
     To browse the catalog one section at a time, click the Browse by category button.</small>

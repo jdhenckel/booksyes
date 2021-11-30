@@ -113,7 +113,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <img src={logo} />
+        <img src={logo} alt="Logo"/>
         
         <h2>Jan Wright</h2>
         <h3>17105 Nowthen Blvd., Anoka, MN 55303</h3>
