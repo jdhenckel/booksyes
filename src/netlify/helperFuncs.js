@@ -7,7 +7,7 @@ exports.buildBooks = (data) => {
 
         for (let i = 0; i < table.cols.length; i++) {
             const col = table.cols[i];
-            const rowValue = row.c[i] === undefined ? "undefined" : row.c[i].v;
+            const rowValue = row.c[i] ? row.c[i].v : "undefined";
             const valueSet = JSON.parse('{"' + col.label + '": "' + rowValue + '"}');
             Object.assign(book, valueSet);
         }
