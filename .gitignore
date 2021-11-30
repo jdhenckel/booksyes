@@ -24,3 +24,6 @@ yarn-error.log*
 
 # Local Netlify folder
 .netlify
+database_conversion/booklist.txt
+database_conversion/books.csv
+database_conversion/categories.csv
