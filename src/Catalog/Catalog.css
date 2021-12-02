@@ -1,0 +1,27 @@
+.catalog {
+    font-family: arial, helv;
+}
+
+.catalog .bookContainer {
+    display: flex;
+    flex-flow: row nowrap;
+    align-content: center;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.catalog.bookContainer>*{
+    flex:0;
+}
+
+.catalog .bookentry {
+    flex: 1;
+}
+
+.bookContainer.even {
+    background-color: white;
+}
+
+.bookContainer.odd {
+    background-color: rgb(243, 243, 218);
+}

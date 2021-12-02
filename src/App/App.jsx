@@ -14,6 +14,7 @@ class App extends Component {
       loading: false,
       showCatalog: false,
       showCategories: false,
+      cart: [],
     }
   }
 
@@ -108,7 +109,28 @@ class App extends Component {
     });
   };
 
+  updateCart = (removeFlag, book) => {
+    var newCart = this.state.cart;
+    if(removeFlag) {
+      for (let i = 0; i < newCart.length; i++) {
+        const element = newCart[i];
+        if(element.title === book.title) {
+          newCart.splice(i, 1);
+          break;
+        }
+      }
+    } else {
+      newCart.push(book);
+    }
+    
+    this.setState((state, props) => {
+      return {
+        cart: newCart
+      };
+    });
 
+    console.log(this.state.cart);
+  }
 
   render() {
     return (
@@ -122,7 +144,7 @@ class App extends Component {
         <h3>Used, collectible, and out-of-print books -- good books -- for children and young people of all ages!</h3>
         <Search searchCallback={this.handleSearch} recentCallback={this.getRecent} hasPhotoCallback={this.getWithPhoto} categoriesCallBack={this.categoryCallBack}></Search>
         {this.state.loading && <div className="loader"><div className="dot-pulse"></div></div>}
-        {this.state.showCatalog && <Catalog books={this.state.books}></Catalog>}
+        {this.state.showCatalog && <Catalog books={this.state.books} changeCart={this.updateCart}></Catalog>}
         {this.state.showCategories && <div className="categories">
           <ul>
             {this.state.categories.map((c, i) => (

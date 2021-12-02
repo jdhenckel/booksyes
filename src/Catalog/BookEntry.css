@@ -1,32 +1,31 @@
-.catalog {
-  font-family: arial, helv;
-}
-.catalog .bookentry {
+
+.bookentry {
   display: flex;
   flex-flow: row nowrap;
 }
-.catalog .bookentry div.main {
+
+.bookentry div.main {
   flex: 1;
   padding: 0 0.5em;
 }
-.catalog .bookentry div.main .author {
+.bookentry div.main .author {
   font-style: italic;
 }
-.catalog .bookentry div.main .title {
+.bookentry div.main .title {
   font-weight: bold;
   text-transform: uppercase;
 }
-.catalog .bookentry div.main .price {
+.bookentry div.main .price {
   font-weight: bold;
   color: #000080;
 }
-.catalog .bookentry div {
+.bookentry div {
   flex: 0;
 }
-.catalog .bookentry .caption {
+.bookentry .caption {
   font-size: 0.5em;
 }
-.catalog .bookentry .inactiveLink {
+.bookentry .inactiveLink {
   pointer-events: none;
   cursor: default;
 }
