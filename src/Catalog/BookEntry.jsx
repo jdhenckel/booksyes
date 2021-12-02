@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "./BookEntry.css";
-import newImage from "./new.gif";
-import noImage from "./noImage.jpg";
+import newImage from "../images/new.gif";
+import noImage from "../images/noImage.jpg";
 
 export default class BookEntry extends Component {
     constructor(props) {

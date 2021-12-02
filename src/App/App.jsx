@@ -4,6 +4,7 @@ import Catalog from '../Catalog/Catalog';
 import Search from '../Search/Search';
 import './App.css';
 import logo from './booksyes.jpg';
+import Cart from '../Cart/Cart';
 
 class App extends Component {
   constructor(props) {
@@ -14,6 +15,7 @@ class App extends Component {
       loading: false,
       showCatalog: false,
       showCategories: false,
+      showCart: false,
       cart: [],
     }
   }
@@ -48,37 +50,51 @@ class App extends Component {
     });
   }
 
+  showModule = (moduleName) => {
+    var newstate = {
+      showCatalog: false,
+      showCategories: false,
+      showCart: false,
+    };
+
+    switch (moduleName) {
+      case 'catalog':
+        newstate.showCatalog = true;
+        break;
+      case 'categories':
+        newstate.showCategories = true;
+        break;
+      case 'cart':
+        newstate.showCart = true;
+        break;
+    }
+
+    this.setState((state, props) => {
+      return newstate;
+    });
+  }
+
   populateCatelog = (books) => {
+    this.showModule('catalog');
     this.setState((state, props) => {
       return {
-        showCatalog: true,
-        showCategories: false,
         books: books,
       };
     });
   };
 
   categoryCallBack = () => {
-    this.setState((state, props) => {
-      return {
-        showCatalog: false,
-      };
-    });
+    
 
     if(this.state.categories.length !== 0) {
-      this.setState((state, props) => {
-        return {
-          showCategories: true,
-        };
-      });
-
+      this.showModule('categories');
       return;
     }
 
     this.handleRequest("categories", null, (data) => {
+      this.showModule('categories');
       this.setState((state, props) => {
         return {
-          showCategories: true,
           categories: data.categories,
         };
       });
@@ -132,6 +148,10 @@ class App extends Component {
     console.log(this.state.cart);
   }
 
+  cartCallback = () => {
+    this.showModule('cart');
+  }
+
   render() {
     return (
       <div className="App">
@@ -142,7 +162,10 @@ class App extends Component {
         <h3>763-753-3429</h3>
         <hr/>
         <h3>Used, collectible, and out-of-print books -- good books -- for children and young people of all ages!</h3>
-        <Search searchCallback={this.handleSearch} recentCallback={this.getRecent} hasPhotoCallback={this.getWithPhoto} categoriesCallBack={this.categoryCallBack}></Search>
+        <div className="searchheading">
+          <button onClick={this.cartCallback}>View My Cart</button>
+          <Search searchCallback={this.handleSearch} recentCallback={this.getRecent} hasPhotoCallback={this.getWithPhoto} categoriesCallBack={this.categoryCallBack} cartCallback={this.cartCallback} />
+        </div>
         {this.state.loading && <div className="loader"><div className="dot-pulse"></div></div>}
         {this.state.showCatalog && <Catalog books={this.state.books} changeCart={this.updateCart}></Catalog>}
         {this.state.showCategories && <div className="categories">
@@ -154,6 +177,7 @@ class App extends Component {
             ))}
           </ul>
         </div>}
+        {this.state.showCart && <Cart cart={this.state.cart} changeCart={this.updateCart}/>}
         <hr/>
         <small><button className="about linklike">About Us</button> | <a href="mailto:bigt40@aol.com">email Jan</a> | <a href="mailto:jdhenckel@gmail.com">email webmaster</a></small>
         <hr/>

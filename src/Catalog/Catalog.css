@@ -2,7 +2,7 @@
     font-family: arial, helv;
 }
 
-.catalog .bookContainer {
+.bookContainer {
     display: flex;
     flex-flow: row nowrap;
     align-content: center;
