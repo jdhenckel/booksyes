@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import Catalog from '../Catalog/Catalog';
 import Search from '../Search/Search';
+import Categories from '../Categories/Categories';
 import './App.css';
 import logo from './booksyes.jpg';
 import Cart from '../Cart/Cart';
@@ -92,12 +93,13 @@ class App extends Component {
     }
 
     this.handleRequest("categories", null, (data) => {
-      this.showModule('categories');
+      
       this.setState((state, props) => {
         return {
           categories: data.categories,
         };
       });
+      this.showModule('categories');
     });
   }
 
@@ -168,16 +170,8 @@ class App extends Component {
         </div>
         {this.state.loading && <div className="loader"><div className="dot-pulse"></div></div>}
         {this.state.showCatalog && <Catalog books={this.state.books} changeCart={this.updateCart}></Catalog>}
-        {this.state.showCategories && <div className="categories">
-          <ul>
-            {this.state.categories.map((c, i) => (
-              <li key={i}>
-                <button onClick={() => this.pickCategory(c)}>{c}</button>
-              </li>
-            ))}
-          </ul>
-        </div>}
-        {this.state.showCart && <Cart cart={this.state.cart} changeCart={this.updateCart}/>}
+        {this.state.showCategories && <Categories categories={this.state.categories} pickCallback={this.pickCategory}/>}
+        {this.state.showCart && <Cart cart={this.state.cart} changeCart={this.updateCart} />}
         <hr/>
         <small><button className="about linklike">About Us</button> | <a href="mailto:bigt40@aol.com">email Jan</a> | <a href="mailto:jdhenckel@gmail.com">email webmaster</a></small>
         <hr/>

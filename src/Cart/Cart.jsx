@@ -6,6 +6,7 @@ export default class Cart extends Component {
         super(props);
         this.state = {
             books: props.cart ?? [],
+            order: {},
         }
     }
 
@@ -17,8 +18,24 @@ export default class Cart extends Component {
         this.props.changeCart(removeFlag, book);
     }
 
+    getOrder = () => {
+        //call the server with all the data and get a total
+        var order = {
+            books: this.state.books,
+            booksCost: 9,
+            shippingCost: 2.5,
+            taxCost: .7,
+            totalCost: 100.54,
+        }
+
+        return order;
+    }
+
     render = () =>
     <div>
+        {(this.state.books === undefined || this.state.books.length == 0) && 
+            <h3>Your Shopping cart is empty</h3>
+        }
         <div className="cart">
             {this.state.books.map((book, index) => (
                 <div className={index % 2 === 0 ? "even" : "odd"}>
@@ -28,10 +45,13 @@ export default class Cart extends Component {
                     <div>{book.price}</div>
                 </div>
             ))}
+            <div>
+                <button>Pay with Other</button>
+                <button>Pay with Paypal</button>
+                <div>{this.state.order.totalCost}</div>
+            </div>
         </div>
         
-        {(this.state.books === undefined || this.state.books.length == 0) && 
-            <h3>Your Shopping cart is empty</h3>
-        }
+        
     </div>
 }
