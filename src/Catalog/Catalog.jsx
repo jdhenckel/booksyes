@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import BookEntry from "./BookEntry";
 import "./Catalog.css";
 
-class Catalog extends Component {
+export default class Catalog extends Component {
     constructor(props) {
         super (props);
         this.state = {
@@ -31,5 +31,3 @@ class Catalog extends Component {
         );
     }
 }
-
-export default Catalog;

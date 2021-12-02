@@ -29,3 +29,15 @@
   pointer-events: none;
   cursor: default;
 }
+
+.bookentry .realImage:not(:hover) {
+  height: 90px;
+}
+
+.bookentry :not(.inactiveLink) .realImage:hover {
+  height: 300px;
+}
+
+.bookentry .realImage {
+  transition: all .5s ease;
+}

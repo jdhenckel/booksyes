@@ -3,7 +3,7 @@ import "./BookEntry.css";
 import newImage from "./new.gif";
 import noImage from "./noImage.jpg";
 
-class BookEntry extends Component {
+export default class BookEntry extends Component {
     constructor(props) {
         super (props);
         this.state = {
@@ -37,7 +37,7 @@ class BookEntry extends Component {
             <div className="bookentry">
                 <div>{this.state.book.ISBN && <img src={"http://images.amazon.com/images/P/" + this.state.book.ISBN + ".01.THUMBZZZ.jpg"} alt="example Book cover"/>}</div>
                 <div className="main">
-                    {this.state.book.isNew === "true" && <img src={newImage} alt="new!"/>}
+                    {this.state.book.isNew === "true" && <img id="newImage" src={newImage} alt="new!"/>}
                     <span className="author">{this.state.book.author} </span>
                     <span className="title">{this.state.book.title} </span>
                     {this.state.book.description} 
@@ -45,12 +45,10 @@ class BookEntry extends Component {
                 </div>
                 <div>
                     <div className="caption">photo of the actual item</div>
-                    <a className={this.state.imageLinks[0] ? "" : "inactiveLink"} href={this.state.imageLinks[0] ? this.state.imageLinks[0] : "" } target="_blank" rel="noopener noreferrer" title="Click to view pictures in a new window">
-                    <img src={this.state.imageLinks[0] ? this.state.imageLinks[0] : noImage} onError={(e) => {e.target.onerror = null; e.target.src=noImage}} border="0" height="90" alt="actual book cover"/></a>
+                    <a className={this.state.imageLinks[0] !== "http://i1103.photobucket.com/albums/g478/booksyes/undefined.jpg" ? "" : "inactiveLink"} href={this.state.imageLinks[0] ? this.state.imageLinks[0] : "" } target="_blank" rel="noopener noreferrer" title="Click to view pictures in a new window">
+                    <img className="realImage" src={this.state.imageLinks[0]} onError={(e) => {e.target.onerror = null; e.target.src=noImage}} border="0" alt="actual book cover"/></a>
                 </div>
             </div>
         );
     }
 }
-
-export default BookEntry;
