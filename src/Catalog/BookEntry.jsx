@@ -23,7 +23,7 @@ export default class BookEntry extends Component {
     makeImageLinks = (imageSrc) => {
         var imageLinks = [];
         const names = imageSrc.split(',');
-    
+        
         for (let i = 0; i < names.length; i++) {
             const element = names[i];
             imageLinks.push('http://i1103.photobucket.com/albums/g478/booksyes/' + element + ".jpg");

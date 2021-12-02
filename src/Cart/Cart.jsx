@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import BookEntry from '../Catalog/BookEntry';
+import './Cart.css';
 
 export default class Cart extends Component {
     constructor(props) {
@@ -18,13 +18,18 @@ export default class Cart extends Component {
     }
 
     render = () =>
-    <div className="cart">
-        {this.state.books.map((book, index) => (
-            <div className={index % 2 === 0 ? "bookContainer even" : "bookContainer odd"}>
-                <button onClick={() => this.changeCart(true, book)}>Remove from Cart</button>
-                <BookEntry key={index} index={index} book={book} changeCart={this.changeCart}></BookEntry>
-            </div>
-        ))}
+    <div>
+        <div className="cart">
+            {this.state.books.map((book, index) => (
+                <div className={index % 2 === 0 ? "even" : "odd"}>
+                    <button onClick={() => this.changeCart(true, book)}>Remove from Cart</button>
+                    <div>{book.author}</div>
+                    <div>{book.title}</div>
+                    <div>{book.price}</div>
+                </div>
+            ))}
+        </div>
+        
         {(this.state.books === undefined || this.state.books.length == 0) && 
             <h3>Your Shopping cart is empty</h3>
         }

@@ -17,11 +17,3 @@
 .catalog .bookentry {
     flex: 1;
 }
-
-.bookContainer.even {
-    background-color: white;
-}
-
-.bookContainer.odd {
-    background-color: rgb(243, 243, 218);
-}

@@ -33,6 +33,14 @@ button.linklike {
   flex: 1;
 }
 
+.even {
+  background-color: white;
+}
+
+.odd {
+  background-color: rgb(243, 243, 218);
+}
+
 /**
  * ==============================================
  * Dot Pulse
