@@ -1,3 +1,5 @@
+[![Netlify Status](https://api.netlify.com/api/v1/badges/81950c7f-33d4-41c1-b955-26183712ee97/deploy-status)](https://app.netlify.com/sites/booksofyesterday/deploys)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
