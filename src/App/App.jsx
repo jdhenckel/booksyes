@@ -68,6 +68,7 @@ class App extends Component {
       case 'cart':
         newstate.showCart = true;
         break;
+      default:
     }
 
     this.setState((state, props) => {
@@ -171,7 +172,7 @@ class App extends Component {
         {this.state.loading && <div className="loader"><div className="dot-pulse"></div></div>}
         {this.state.showCatalog && <Catalog books={this.state.books} changeCart={this.updateCart}></Catalog>}
         {this.state.showCategories && <Categories categories={this.state.categories} pickCallback={this.pickCategory}/>}
-        {this.state.showCart && <Cart cart={this.state.cart} changeCart={this.updateCart} />}
+        {this.state.showCart && <Cart cart={this.state.cart} changeCart={this.updateCart}/>}
         <hr/>
         <small><button className="about linklike">About Us</button> | <a href="mailto:bigt40@aol.com">email Jan</a> | <a href="mailto:jdhenckel@gmail.com">email webmaster</a></small>
         <hr/>
