@@ -22,17 +22,6 @@ button.linklike {
   cursor: pointer;
 }
 
-.searchheading {
-  background-color: rgb(243, 243, 218);
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-}
-
-.searchheading div {
-  flex: 1;
-}
-
 .even {
   background-color: white;
 }

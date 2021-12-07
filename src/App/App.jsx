@@ -168,8 +168,7 @@ class App extends Component {
           <h3>Used, collectible, and out-of-print books -- good books -- for children and young people of all ages!</h3>
         </div>
         <div className="searchheading sticky top">
-          <button onClick={this.cartCallback}>View My Cart</button>
-          <Search searchCallback={this.handleSearch} recentCallback={this.getRecent} hasPhotoCallback={this.getWithPhoto} categoriesCallBack={this.categoryCallBack} cartCallback={this.cartCallback} />
+          <Search cartcount={this.state.cart.length} searchCallback={this.handleSearch} recentCallback={this.getRecent} hasPhotoCallback={this.getWithPhoto} categoriesCallBack={this.categoryCallBack} cartCallback={this.cartCallback} />
         </div>
 
         {this.state.loading && <div className="loader"><div className="dot-pulse"></div></div>}

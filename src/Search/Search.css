@@ -4,10 +4,9 @@
     justify-content: center;
     align-items: center;
     row-gap: 1em;
-}
-
-.search .category {
-    align-self: center;
+    padding-bottom: 10px;
+    background-color: rgb(243, 243, 218);
+    transform: translate3d(0,0,0);
 }
 
 .search .gobutton {
@@ -28,4 +27,8 @@
 
 .search .infotext {
     width: 50%;
+}
+
+.search button {
+    margin: 5px;
 }
