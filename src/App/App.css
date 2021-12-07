@@ -41,6 +41,24 @@ button.linklike {
   background-color: rgb(243, 243, 218);
 }
 
+.sticky {
+  position: sticky;
+}
+
+.sticky.top {
+  top: 0;
+}
+
+.sticky.bottom {
+  bottom: 0;
+}
+
+.footer {
+  width: 100%;
+  padding-bottom: 30px;
+  background-color: rgb(243, 243, 218);
+}
+
 /**
  * ==============================================
  * Dot Pulse

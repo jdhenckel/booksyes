@@ -21,12 +21,13 @@ export default class Catalog extends Component {
     render() {
         return(
             <div className="catalog">
+                {(this.state.books === undefined || this.state.books.length === 0) && <h3>This query returned no results.</h3>}
                 {this.state.books.map((b, index) => (
                     <div className={index % 2 === 0 ? "bookContainer even" : "bookContainer odd"}>
                         <button onClick={() => this.changeCart(false, b)}>Add to Cart</button>
                         <BookEntry key={b.id} index={index} book={b} changeCart={this.changeCart}></BookEntry>
                     </div>
-                ))}                
+                ))}
             </div>
         );
     }

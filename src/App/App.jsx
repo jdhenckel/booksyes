@@ -158,25 +158,30 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <img src={logo} alt="Logo"/>
-        
-        <h2>Jan Wright</h2>
-        <h3>17105 Nowthen Blvd., Anoka, MN 55303</h3>
-        <h3>763-753-3429</h3>
-        <hr/>
-        <h3>Used, collectible, and out-of-print books -- good books -- for children and young people of all ages!</h3>
-        <div className="searchheading">
+        <div className="sticky">
+          <img src={logo} alt="Logo"/>
+          
+          <h2>Jan Wright</h2>
+          <h3>17105 Nowthen Blvd., Anoka, MN 55303</h3>
+          <h3>763-753-3429</h3>
+          <hr/>
+          <h3>Used, collectible, and out-of-print books -- good books -- for children and young people of all ages!</h3>
+        </div>
+        <div className="searchheading sticky top">
           <button onClick={this.cartCallback}>View My Cart</button>
           <Search searchCallback={this.handleSearch} recentCallback={this.getRecent} hasPhotoCallback={this.getWithPhoto} categoriesCallBack={this.categoryCallBack} cartCallback={this.cartCallback} />
         </div>
+
         {this.state.loading && <div className="loader"><div className="dot-pulse"></div></div>}
         {this.state.showCatalog && <Catalog books={this.state.books} changeCart={this.updateCart}></Catalog>}
         {this.state.showCategories && <Categories categories={this.state.categories} pickCallback={this.pickCategory}/>}
         {this.state.showCart && <Cart cart={this.state.cart} changeCart={this.updateCart}/>}
-        <hr/>
-        <small><button className="about linklike">About Us</button> | <a href="mailto:bigt40@aol.com">email Jan</a> | <a href="mailto:jdhenckel@gmail.com">email webmaster</a></small>
-        <hr/>
-        <small>This way-cool web site developed by <a href="www.poorfox.com">poorfox</a>.</small>
+        <div className="footer sticky bottom">
+          <hr/>
+          <small><button className="about linklike">About Us</button> | <a href="mailto:bigt40@aol.com">email Jan</a> | <a href="mailto:jdhenckel@gmail.com">email webmaster</a></small>
+          <hr/>
+          <small>This way-cool web site developed by <a href="www.poorfox.com">poorfox</a>.</small>
+        </div>
       </div>
     );
   }
