@@ -3,9 +3,10 @@ import axios from 'axios';
 import Catalog from '../Catalog/Catalog';
 import Search from '../Search/Search';
 import Categories from '../Categories/Categories';
+import Cart from '../Cart/Cart';
+import Success from '../Cart/Success';
 import './App.css';
 import logo from './booksyes.jpg';
-import Cart from '../Cart/Cart';
 
 class App extends Component {
   constructor(props) {
@@ -17,6 +18,7 @@ class App extends Component {
       showCatalog: false,
       showCategories: false,
       showCart: false,
+      showSuccess: false,
       cart: [],
     }
   }
@@ -56,6 +58,7 @@ class App extends Component {
       showCatalog: false,
       showCategories: false,
       showCart: false,
+      showSuccess: false,
     };
 
     switch (moduleName) {
@@ -67,6 +70,9 @@ class App extends Component {
         break;
       case 'cart':
         newstate.showCart = true;
+        break;
+      case 'success':
+        newstate.showSuccess = true;
         break;
       default:
     }
@@ -172,9 +178,10 @@ class App extends Component {
         </div>
 
         {this.state.loading && <div className="loader"><div className="dot-pulse"></div></div>}
+        {this.state.showSuccess && <Success></Success>}
         {this.state.showCatalog && <Catalog books={this.state.books} changeCart={this.updateCart}></Catalog>}
         {this.state.showCategories && <Categories categories={this.state.categories} pickCallback={this.pickCategory}/>}
-        {this.state.showCart && <Cart cart={this.state.cart} changeCart={this.updateCart}/>}
+        {this.state.showCart && <Cart cart={this.state.cart} successCallback={() => this.showModule('success')} changeCart={this.updateCart}/>}
         <div className="footer sticky bottom">
           <hr/>
           <small><button className="about linklike">About Us</button> | <a href="mailto:bigt40@aol.com">email Jan</a> | <a href="mailto:jdhenckel@gmail.com">email webmaster</a></small>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Search.css';
 
-function Search(props) {
+export default function Search(props) {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [scrolled, setScrolled] = useState(false);
@@ -77,5 +77,3 @@ To browse the catalog one section at a time, click the Browse by category button
         </div>
     );
 }
-
-export default Search;

@@ -15,6 +15,7 @@ export default class Cart extends Component {
             address: {},
             showpopup: false,
             popupMessage: "",
+            orderSuccess: false,
         }
     }
 
@@ -24,6 +25,16 @@ export default class Cart extends Component {
         this.setState({
             showpopup: false,
         });
+    }
+
+    showSuccessMessage = () => {
+        const booksToRemove = [...this.state.books];
+        booksToRemove.forEach((b) => this.changeCart(true, b));
+        this.setState({
+            showorder: false,
+        });
+
+        this.props.successCallback();
     }
 
     showPopupMessage = (message) => {
@@ -98,6 +109,7 @@ export default class Cart extends Component {
     submitOrder = (order) => {
         var myOrder = order;
         myOrder.totalTaxed = myOrder.subtotal + myOrder.tax + myOrder.shippingcost;
+        myOrder.totalTaxed = Math.round((myOrder.totalTaxed + Number.EPSILON) * 100) / 100;
         myOrder.totalUntaxed = myOrder.subtotal + myOrder.shippingcost;
         myOrder.shippingAddress = this.state.address;
         axios.post('/.netlify/functions/placeorder', {
@@ -105,6 +117,7 @@ export default class Cart extends Component {
         }).then(response => {
             console.log(response);
             //Change screen to order success!
+            this.showSuccessMessage();
         }).catch(error => {
             console.log(error);
             this.showPopupMessage("There was a problem placing you order.  You can try again or contact Jan directly to place an order.")
@@ -114,15 +127,7 @@ export default class Cart extends Component {
     render = () =>
     <div className="order">
         {this.state.showpopup && <Popup handleClose={this.hidePopup}>{this.state.popupMessage}</Popup> }
-        {this.cartIsEmpty() && <h3 className="cart">Your Shopping cart is empty</h3>}
-        {this.cartIsEmpty() && <button onClick={() => this.showPopupMessage("Test!")}>test popup</button>}
-        {this.state.orderSuccess ? 
-            <div>
-                <h3 className="cart">Success! Thankyou for your order.</h3>
-                <h4>You should recive a confirmation E-mail soon!</h4>
-            </div>
-            :
-        <React.Fragment>
+            {this.cartIsEmpty() && <h3 className="cart">Your Shopping cart is empty</h3>}
         <div className="cart">
             {!this.cartIsEmpty() && <div>
                  <button onClick={this.getOrder}>{this.state.showorder ? "Update Cart" : "Check out"}</button>
@@ -163,7 +168,6 @@ export default class Cart extends Component {
         </div>}
         {this.state.showorder && <div className="message">
         <textarea value={this.state.address.message || ''} name="message" onChange={this.handleChange} placeholder="Message for Jan" />
-            </div>}
-        </React.Fragment>}
+        </div>}
     </div>
 }

@@ -1,3 +1,5 @@
+const axios = require('axios');
+
 exports.searchCol = "A";
 exports.categoryCol = "J";
 exports.imageCol = "I";
@@ -23,12 +25,27 @@ exports.buildBooks = (data) => {
     return JSON.stringify(retObj);
 };
 
-exports.buildURL = (query, sheet) => {
+const buildSettings = exports.buildSettings = (data) => {
+    const table = JSON.parse(data.replace(/^\)]\}'\n/, '')).table;
+    const settingObj = {};
+
+    for (let r = 1; r < table.rows.length; r++) {
+        const row = table.rows[r];
+        
+        const newObj = JSON.parse('{"' + row.c[0].v + '": "' + row.c[1].v + '"}');
+        Object.assign(settingObj, newObj);
+    }
+
+    return settingObj;
+}
+
+const buildURL = exports.buildURL = (query, sheet) => {
     const {DATABASE_SHEET_BOOKS} = process.env;
     const {DATABASE_SHEET_CATEGORIES} = process.env;
     const {DATABASE_LOCATION} = process.env;
     const {DATABASE_KEY} = process.env;
-    
+    const {DATABASE_SHEET_SETTINGS} = process.env;
+
     var id;
     switch(sheet) {
         case "books":
@@ -37,6 +54,9 @@ exports.buildURL = (query, sheet) => {
         case "categories":
             id = DATABASE_SHEET_CATEGORIES;
             break;
+        case "settings":
+            id = DATABASE_SHEET_SETTINGS;
+        break;
     }
 
     const key = "&key=" + DATABASE_KEY;
@@ -45,3 +65,5 @@ exports.buildURL = (query, sheet) => {
     const endpoint = DATABASE_LOCATION + "tq?" + request + key + gid;
     return endpoint;
 };
+
+exports.getSettings = () => axios.get(buildURL("select *", "settings"), {headers: {'X-DataSource-Auth':""}}).then(response => buildSettings(response.data));
