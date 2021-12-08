@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 import './Cart.css';
-const paypalHelper = require('./paypal.js');
+import Popup from '../popup/popup.jsx';
+
+import paypalHelper from'./paypal.js';
 
 export default class Cart extends Component {
     constructor(props) {
@@ -11,10 +13,25 @@ export default class Cart extends Component {
             order: {},
             showorder: false,
             address: {},
+            showpopup: false,
+            popupMessage: "",
         }
     }
 
     cartIsEmpty = () => (this.state.books === undefined || this.state.books.length === 0);
+
+    hidePopup = () => {
+        this.setState({
+            showpopup: false,
+        });
+    }
+
+    showPopupMessage = (message) => {
+        this.setState({
+            showpopup: true,
+            popupMessage: message,
+        });
+    }
 
     componentWillReceiveProps(nextProps) {
         this.setState({ books: nextProps.cart }); 
@@ -50,7 +67,7 @@ export default class Cart extends Component {
 
     getOrder = () => {
         //call the server with all the data and get a total
-        axios.post("/.netlify/functions/getorder", { booklist: this.state.books })
+        axios.post("/.netlify/functions/getorder", { books: this.state.books })
         .then(response => {
             console.log(response.data);
             this.setState((state, props) => {
@@ -59,27 +76,53 @@ export default class Cart extends Component {
                     showorder: true
                 }
             });
-        });
+        }).catch(error => console.log(error));
     }
 
     orderwithother = () => {
-
+        var myOrder = this.state.order;
+        myOrder.paymentType = "other (payment pending)";
+        this.submitOrder(myOrder);
     }
 
     orderwithpaypal = (taxed) => {
         var myOrder = this.state.order;
         if(!taxed) myOrder.tax = 0;
+        myOrder.paymenttype = "Paypal";
         myOrder.total = myOrder.subtotal + myOrder.tax + myOrder.shippingcost;
-        myOrder.shippingAddress = this.state.address;
-        console.log(myOrder);
         var request = paypalHelper.createPaypalOrder(myOrder);
         console.log(request);
+        //redirect to paypal screen
+    }
+
+    submitOrder = (order) => {
+        var myOrder = order;
+        myOrder.totalTaxed = myOrder.subtotal + myOrder.tax + myOrder.shippingcost;
+        myOrder.totalUntaxed = myOrder.subtotal + myOrder.shippingcost;
+        myOrder.shippingAddress = this.state.address;
+        axios.post('/.netlify/functions/placeorder', {
+            body: {order: order},
+        }).then(response => {
+            console.log(response);
+            //Change screen to order success!
+        }).catch(error => {
+            console.log(error);
+            this.showPopupMessage("There was a problem placing you order.  You can try again or contact Jan directly to place an order.")
+        })
     }
 
     render = () =>
     <div className="order">
+        {this.state.showpopup && <Popup handleClose={this.hidePopup}>{this.state.popupMessage}</Popup> }
         {this.cartIsEmpty() && <h3 className="cart">Your Shopping cart is empty</h3>}
-
+        {this.cartIsEmpty() && <button onClick={() => this.showPopupMessage("Test!")}>test popup</button>}
+        {this.state.orderSuccess ? 
+            <div>
+                <h3 className="cart">Success! Thankyou for your order.</h3>
+                <h4>You should recive a confirmation E-mail soon!</h4>
+            </div>
+            :
+        <React.Fragment>
         <div className="cart">
             {!this.cartIsEmpty() && <div>
                  <button onClick={this.getOrder}>{this.state.showorder ? "Update Cart" : "Check out"}</button>
@@ -106,17 +149,21 @@ export default class Cart extends Component {
         </div>}
         {this.state.showorder && <div className="address">
             <input value={this.state.address.recipient_name  || ''} name="recipient_name" onChange={this.handleChange} type="name" className="full" placeholder="Name" />
+            <input value={this.state.address.phone || ''} name="phone" onChange={this.handleChange} type="tel" className="half" placeholder="Phone Number"/>
             <input value={this.state.address.email || ''} name="email" onChange={this.handleChange} type="email" className="full" placeholder="E-Mail Address"/>
             <input value={this.state.address.line1 || ''} name="line1" onChange={this.handleChange} type="street" className="full" placeholder="Street" />
             <input value={this.state.address.city || ''} name="city" onChange={this.handleChange} type="city" className="half" placeholder="City" />
             <input value={this.state.address.state || ''} name="state" onChange={this.handleChange} type="state" placeholder="State" />
             <input value={this.state.address.postal_code || ''} name="postal_code" onChange={this.handleChange} type="zip" placeholder="Zip" />
-            <input value={this.state.address.country_code || ''} name="country_code" onChange={this.handleChange} type="country" className="half" placeholder="Country" />
+            <div className="buttons">
+            <button onClick={() => this.orderwithpaypal(true)}>Pay with Paypal (MN Tax)</button>
+            <button onClick={() => this.orderwithpaypal(false)}>Pay with Paypal (No MN Tax)</button>
+            <button onClick={this.orderwithother}>Pay with other</button>
+        </div>
         </div>}
-        {this.state.showorder && <div className="buttons">
-            <button onClick={() => this.orderwithpaypal(true)}>Pay with Paypal (MN Shipping)</button>
-            <button onClick={() => this.orderwithpaypal(false)}>Pay with Paypal (Non-MN Shipping)</button>
-            <button>Pay with other</button>
-        </div>}
+        {this.state.showorder && <div className="message">
+        <textarea value={this.state.address.message || ''} name="message" onChange={this.handleChange} placeholder="Message for Jan" />
+            </div>}
+        </React.Fragment>}
     </div>
 }

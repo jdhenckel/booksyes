@@ -1,9 +1,10 @@
 .order {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
+    flex-direction: row-reverse;
     width: 70%;
     margin: auto;
+    flex-wrap: wrap;
+    justify-content: flex-start;
 }
 
 .order button {
@@ -12,6 +13,7 @@
 
 .confirm {
     width: 30%;
+    margin-left: 30%
 }
 
 .cart {
@@ -36,10 +38,6 @@
     flex-wrap: wrap;
 }
 
-.address>input {
-    float: left;
-}
-
 .address>input, .address>label {
     margin: 5px 5px;
 }
@@ -50,4 +48,14 @@
 
 .address>.half {
     flex-grow: 2;
+}
+
+.message {
+    width: 40%;
+    margin-right: 10%;
+}
+
+.message>textarea {
+    width: 100%;
+    height: 200px;
 }

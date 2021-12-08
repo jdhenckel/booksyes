@@ -7,7 +7,7 @@ const helpers = require('./helperFuncs.js');
 
 exports.handler = async function(event, context) {
     try {
-        const books = JSON.parse(event.body).booklist;
+        const books = JSON.parse(event.body).books;
 
         const subtotal = books.reduce((total, book) => total + Number.parseFloat(book.price), 0);
         const tax = subtotal * .065; //mn tax is 6.5%

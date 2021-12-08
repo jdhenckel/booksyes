@@ -1,4 +1,4 @@
-export function createPaypalOrder(order) {
+exports.createPaypalOrder = (order) => {
     const booksAsItems = order.books.map((book) => {return {name: book.title, price: book.price}} );
     const key = 'My private and secret key';
     var headers = {
