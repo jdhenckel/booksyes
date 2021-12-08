@@ -25,7 +25,7 @@ export default class Catalog extends Component {
                 {this.state.books.map((b, index) => (
                     <div className={index % 2 === 0 ? "bookContainer even" : "bookContainer odd"}>
                         <button onClick={() => this.changeCart(false, b)}>Add to Cart</button>
-                        <BookEntry key={b.id} index={index} book={b} changeCart={this.changeCart}></BookEntry>
+                        <BookEntry key={index} book={b}></BookEntry>
                     </div>
                 ))}
             </div>

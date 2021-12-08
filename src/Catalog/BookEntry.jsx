@@ -1,54 +1,49 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import "./BookEntry.css";
 import newImage from "../images/new.gif";
-import noImage from "../images/noImage.jpg";
+//import noImage from "../images/noImage.jpg";
 
-export default class BookEntry extends Component {
-    constructor(props) {
-        super (props);
-        this.state = {
-            book: props.book ?? {},
-            imageLinks: [],
-        }
-    }
+function BookEntry(props) {
+    const [images, setImages] = useState([]);
 
-    componentWillReceiveProps(nextProps) {
-        const links = this.makeImageLinks(nextProps.book.imageSrc);
-        this.setState({
-            book: nextProps.book,
-            imageLinks: links,
+    useEffect(() => {
+        getAllImages();
+        // eslint-disable-next-line
+    }, []);
+
+    const getAllImages = () => {
+        var imageNames = [];
+        const names = props.book.imageSrc?.split(',');
+        if(names) names.forEach(name => {
+            imageNames.push('http://i1103.photobucket.com/albums/g478/booksyes/' + name + '.jpg');
+            imageNames.push('http://hosting.photobucket.com/images/g478/booksyes/' + name + '.jpg');
         });
+
+        setImages(imageNames);
     }
 
-    makeImageLinks = (imageSrc) => {
-        var imageLinks = [];
-        const names = imageSrc.split(',');
-        
-        for (let i = 0; i < names.length; i++) {
-            const element = names[i];
-            imageLinks.push('http://i1103.photobucket.com/albums/g478/booksyes/' + element + ".jpg");
-        }
-    
-        return imageLinks;
+    const imageError = (e) => {
+        e.target.style.display = 'none';
     }
 
-    render() {
-        return(
-            <div className="bookentry">
-                <div>{this.state.book.ISBN && <img src={"http://images.amazon.com/images/P/" + this.state.book.ISBN + ".01.THUMBZZZ.jpg"} alt="example Book cover"/>}</div>
-                <div className="main">
-                    {this.state.book.isNew === "true" && <img id="newImage" src={newImage} alt="new!"/>}
-                    <span className="author">{this.state.book.author} </span>
-                    <span className="title">{this.state.book.title} </span>
-                    {this.state.book.description} 
-                    <span className="price"> ${this.state.book.price} </span>
-                </div>
-                <div>
-                    <div className="caption">photo of the actual item</div>
-                    <a className={this.state.imageLinks[0] !== "http://i1103.photobucket.com/albums/g478/booksyes/undefined.jpg" ? "" : "inactiveLink"} href={this.state.imageLinks[0] ? this.state.imageLinks[0] : "" } target="_blank" rel="noopener noreferrer" title="Click to view pictures in a new window">
-                    <img className="realImage" src={this.state.imageLinks[0]} onError={(e) => {e.target.onerror = null; e.target.src=noImage}} border="0" alt="actual book cover"/></a>
-                </div>
+    return (
+        <div className="bookentry">
+            <div><img className="bookImage" onError={imageError} src={'https://covers.openlibrary.org/b/isbn/' + props.book.ISBN + '-L.jpg?default=false'} alt="example Book cover"/></div>
+            <div className="main">
+                {props.book.isNew === "true" && <img id="newImage" src={newImage} alt="new!"/>}
+                <span className="author">{props.book.author} </span>
+                <span className="title">{props.book.title} </span>
+                {props.book.description} 
+                <span className="price"> ${props.book.price} </span>
             </div>
-        );
-    }
+            {(images && images.length !== 0) && <div>
+                <div className="caption">photo of the actual item</div>
+                {images.map((image, index) => (
+                    <img key={index} className="bookImage" onError={imageError} src={image} border="0" alt="actual book cover"/>
+                ))}
+            </div>}
+        </div>
+    );
 }
+
+export default BookEntry;

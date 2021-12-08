@@ -1,7 +1,7 @@
-
 .bookentry {
   display: flex;
   flex-flow: row nowrap;
+  min-height: 90px;
 }
 
 .bookentry div.main {
@@ -30,14 +30,14 @@
   cursor: default;
 }
 
-.bookentry .realImage:not(:hover) {
+.bookentry .bookImage:not(:hover) {
   height: 90px;
 }
 
-.bookentry :not(.inactiveLink) .realImage:hover {
+.bookentry :not(.inactiveLink) .bookImage:hover {
   height: 300px;
 }
 
-.bookentry .realImage {
+.bookentry .bookImage {
   transition: all .5s ease;
 }
