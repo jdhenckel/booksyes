@@ -128,7 +128,7 @@ export default class Cart extends Component {
         console.log(data);
         var myOrder = this.state.order;
         if(details.status === "COMPLETED") {
-            myOrder.paymenttype = "Paypal(Paid): " + details.id;
+            myOrder.paymentType = "Paypal(Paid): " + details.id;
             this.submitOrder(myOrder);
         } else {
             this.showPopupMessage(`There was a problem with your paypal payment.`);
