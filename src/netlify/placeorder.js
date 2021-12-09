@@ -4,7 +4,6 @@ const helpers = require('./helperFuncs.js');
 const SparkPost = require('sparkpost');
 const client = new SparkPost(SPARKPOST_API);
 const templates = require('./emailTemplates.js');
-const { default: axios } = require('axios');
 
 exports.handler = async function(event, context) {
     try {

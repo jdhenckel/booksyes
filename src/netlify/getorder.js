@@ -13,11 +13,14 @@ exports.handler = async function(event, context) {
         const tax = subtotal * settings.mntax;
         const shipping = subtotal >= settings.freeshippingafter ? 0 : Number.parseFloat(settings.shippingcost) + (Number.parseFloat(settings.additionalshippingcost) * (books.length - 1));
 
+        const {PAYPAL_CLIENT_ID} = process.env;
+
         const order = {
             books: books,
             subtotal: subtotal,
             shippingcost: shipping,
             tax: Math.round((tax + Number.EPSILON) * 100) / 100, //properly round to two decimal places
+            clientId: PAYPAL_CLIENT_ID,
         };
 
         return {

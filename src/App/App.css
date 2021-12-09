@@ -46,6 +46,7 @@ button.linklike {
   width: 100%;
   padding-bottom: 30px;
   background-color: rgb(243, 243, 218);
+  z-index: 100;
 }
 
 /**
