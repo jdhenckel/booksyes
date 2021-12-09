@@ -5,8 +5,6 @@ import Popup from '../popup/popup.jsx';
 import { PayPalButton } from 'react-paypal-button-v2';
 import { debounce } from "lodash";
 
-const EmailRegex = new RegExp('', 'gi');
-
 export default class Cart extends Component {
     constructor(props) {
         super(props);
@@ -76,7 +74,7 @@ export default class Cart extends Component {
     }
 
     validateEmail = () => {
-        if(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(this.state.address.email)) {
+        if(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(this.state.address.email)) {
             this.setState({isFormValid: true});
             this.state.paypalButtonActions && this.state.paypalButtonActions.enable();
         } else {
@@ -128,7 +126,7 @@ export default class Cart extends Component {
         console.log(data);
         var myOrder = this.state.order;
         if(details.status === "COMPLETED") {
-            myOrder.paymentType = "Paypal(Paid): " + details.id;
+            myOrder.paymentType = "Paypal(Paid). Order Number: " + details.id;
             this.submitOrder(myOrder);
         } else {
             this.showPopupMessage(`There was a problem with your paypal payment.`);
