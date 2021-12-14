@@ -173,7 +173,7 @@ class App extends Component {
           <hr/>
           <h3>Used, collectible, and out-of-print books -- good books -- for children and young people of all ages!</h3>
         </div>
-        <div className="searchheading sticky top">
+        <div className="header sticky top">
           <Search cartcount={this.state.cart.length} searchCallback={this.handleSearch} recentCallback={this.getRecent} hasPhotoCallback={this.getWithPhoto} categoriesCallBack={this.categoryCallBack} cartCallback={this.cartCallback} />
         </div>
 
