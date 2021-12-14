@@ -179,7 +179,7 @@ class App extends Component {
 
         {this.state.loading && <div className="loader"><div className="dot-pulse"></div></div>}
         {this.state.showSuccess && <Success></Success>}
-        {this.state.showCatalog && <Catalog books={this.state.books} changeCart={this.updateCart}></Catalog>}
+        {this.state.showCatalog && <Catalog books={this.state.books} cart={this.state.cart} changeCart={this.updateCart}></Catalog>}
         {this.state.showCategories && <Categories categories={this.state.categories} pickCallback={this.pickCategory}/>}
         {this.state.showCart && <Cart cart={this.state.cart} successCallback={() => this.showModule('success')} changeCart={this.updateCart}/>}
         <div className="footer sticky bottom">
