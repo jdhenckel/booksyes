@@ -24,6 +24,17 @@ exports.handler = async function(event, context) {
             };
         });
 
+        //check all required fields are present
+        var orderIsValid = true && order.shippingAddress.recipient_name;
+        orderIsValid = orderIsValid && order.shippingAddress.line1;
+        orderIsValid = orderIsValid && order.shippingAddress.city;
+        orderIsValid = orderIsValid && order.shippingAddress.state;
+        orderIsValid = orderIsValid && order.shippingAddress.postal_code;
+        orderIsValid = orderIsValid && order.shippingAddress.email;
+        if(!orderIsValid) {
+            throw 'Missing some required contact or shipping information.  please correct it and try again.';
+        }
+
         //write order to database
         //TODO
 
