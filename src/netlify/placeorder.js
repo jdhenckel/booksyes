@@ -1,9 +1,10 @@
 //called with /.netlify/functions/placeorder
-const {SPARKPOST_API} = process.env;
+const {SPARKPOST_API, RECAPTCHA_SECRECT} = process.env;
 const helpers = require('./helperFuncs.js');
 const SparkPost = require('sparkpost');
 const client = new SparkPost(SPARKPOST_API);
 const templates = require('./emailTemplates.js');
+const { default: axios } = require('axios');
 
 exports.handler = async function(event, context) {
     try {
@@ -12,6 +13,16 @@ exports.handler = async function(event, context) {
         escapeAll(exscapedOrder);
 
         const settings = await helpers.getSettings();
+
+        //check recaptcha
+        const res = await axios.post(
+            `https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SECRECT}&response=${order.recaptchaToken}`
+        ).then(response => {
+            //check if Recaptcha thinks this is a bot
+            if(!response.data.success) {
+                throw 'Invalid ReCAPTCHA, please try again.';
+            };
+        });
 
         //write order to database
         //TODO
@@ -54,7 +65,7 @@ exports.handler = async function(event, context) {
 
 function handleErrors(error) {
     console.error(error);
-    throw "Sparkport had an error sending an email."
+    throw "There was an problem completing your order. You can try resubmitting it, or contact Jan directly using the link at the bottom of the page";
 }
 
 function handleSuccess(data) {

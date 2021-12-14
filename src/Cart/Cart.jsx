@@ -4,6 +4,9 @@ import './Cart.css';
 import Popup from '../popup/popup.jsx';
 import { PayPalButton } from 'react-paypal-button-v2';
 import { debounce } from "lodash";
+import ReCAPTCHA from 'react-google-recaptcha';
+
+const RECAPTCHA_KEY = '6LerI6EdAAAAANsjsZnGhftz1zV03RsIee47LukQ';
 
 export default class Cart extends Component {
     constructor(props) {
@@ -19,6 +22,7 @@ export default class Cart extends Component {
             useMnTax: true,
             isFormValid: false,
             paypalButtonActions: {},
+            recaptchaToken: '',
         }
 
         this.onChangeEmailDebounce = debounce(this.validateEmail, 2000);
@@ -84,6 +88,11 @@ export default class Cart extends Component {
         }
     }
 
+    recaptchaOnChange = (value) => {
+        console.log(value);
+        this.setState({recaptchaToken: value});
+    }
+
     orderSubtotal = () => {
         var totalCost = 0;
         this.state.books.forEach(b => {
@@ -143,7 +152,9 @@ export default class Cart extends Component {
     }
 
     submitOrder = (order) => {
+
         var myOrder = order;
+        myOrder.recaptchaToken = this.state.recaptchaToken;
         myOrder.totalTaxed = myOrder.subtotal + myOrder.tax + myOrder.shippingcost;
         myOrder.totalTaxed = Math.round((myOrder.totalTaxed + Number.EPSILON) * 100) / 100;
         myOrder.totalUntaxed = myOrder.subtotal + myOrder.shippingcost;
@@ -152,21 +163,17 @@ export default class Cart extends Component {
             body: {order: order},
         }).then(response => {
             console.log(response);
-            //Change screen to order success!
             this.showSuccessMessage();
         }).catch(error => {
             console.log(error);
-            if(myOrder.paymenttype === "other (payment pending)") {
-                this.showPopupMessage("There was a problem placing you order.\nYou can try again or contact Jan directly to place an order.");
-            } else {
-                this.showPopupMessage(`There was a problem placing you order.\nYour PayPal payment was successful.\nPlease Contact Jan directly with this order number: ${myOrder.paymentType}`);
-            }
+            window.grecaptcha.reset();
+            this.showPopupMessage(`ERROR ${error.response.status}:\n${error.response.data}`);
         })
     }
 
     render = () =>
     <div className="order">
-        {this.state.showpopup && <Popup handleClose={this.hidePopup}>{this.state.popupMessage}</Popup> }
+        {this.state.showpopup && <Popup handleClose={this.hidePopup}><pre>{this.state.popupMessage}</pre></Popup> }
             {this.cartIsEmpty() && <h3 className="cart">Your Shopping cart is empty</h3>}
         <div className="cart">
             {!this.cartIsEmpty() && <div>
@@ -209,7 +216,8 @@ export default class Cart extends Component {
                             onInit={(data, actions) => this.paypalInit(data, actions)}
                             style={{height: 25, layout: 'horizontal', color: 'blue', shape: 'rect', tagline: 'false'}} 
                             options={{clientId:this.state.order.clientId}} />
-            <button disabled={!this.state.isFormValid} onClick={this.orderwithother}>Pay with other</button>   
+            <button disabled={!this.state.isFormValid} onClick={this.orderwithother}>Pay with other</button>
+            <ReCAPTCHA onChange={this.recaptchaOnChange} sitekey={RECAPTCHA_KEY} />
         </div>}    
     </div>
 }
