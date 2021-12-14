@@ -3,8 +3,8 @@ import axios from 'axios';
 import './Cart.css';
 import Popup from '../popup/popup.jsx';
 import { PayPalButton } from 'react-paypal-button-v2';
-import { debounce } from "lodash";
 import ReCAPTCHA from 'react-google-recaptcha';
+import debounce from 'lodash.debounce';
 
 const RECAPTCHA_KEY = '6LerI6EdAAAAANsjsZnGhftz1zV03RsIee47LukQ';
 
@@ -15,7 +15,30 @@ export default class Cart extends Component {
             books: props.cart ?? [],
             order: {},
             showorder: false,
-            address: {},
+            address: {
+                recipient_name: '',
+                line1:'',
+                city:'',
+                state:'',
+                postal_code:'',
+                email: '',
+            },
+            touched: {
+                recipient_name: false,
+                line1:false,
+                city:false,
+                state:false,
+                postal_code:false,
+                email: false,
+            },
+            errors: {
+                recipient_name: false,
+                line1:false,
+                city:false,
+                state:false,
+                postal_code:false,
+                email: false
+            },
             showpopup: false,
             popupMessage: "",
             orderSuccess: false,
@@ -23,9 +46,8 @@ export default class Cart extends Component {
             isFormValid: false,
             paypalButtonActions: {},
             recaptchaToken: '',
+            debouncedValidate: debounce(this.doValidation, 500)
         }
-
-        this.onChangeEmailDebounce = debounce(this.validateEmail, 2000);
     }
 
     cartIsEmpty = () => (this.state.books === undefined || this.state.books.length === 0);
@@ -68,29 +90,78 @@ export default class Cart extends Component {
             address: {
                 ...this.state.address,
                 [name]:value,
+            },
+            isFormValid: false,
+        });
+
+        this.state.debouncedValidate();
+    }
+
+    handleBlur = (event) => {
+        const name = event.target.name;
+        this.setState({
+            touched: {
+                ...this.state.touched,
+                [name]: true,
             }
         });
 
-        if(name==="email") {
-            this.onChangeEmailDebounce();
-            this.state.paypalButtonActions && this.state.paypalButtonActions.disable();
-        }
+        this.state.debouncedValidate();
+    }
+
+    shouldMarkError = (field) => {
+        const hasError = this.state.errors[field];
+        const isTouched = this.state.touched[field];
+        return isTouched && hasError;
     }
 
     validateEmail = () => {
-        if(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(this.state.address.email)) {
-            this.setState({isFormValid: true});
-            this.state.paypalButtonActions && this.state.paypalButtonActions.enable();
-        } else {
-            this.setState({isFormValid: false});
-            this.state.paypalButtonActions && this.state.paypalButtonActions.disable();
-            this.showPopupMessage('Unable to validate that email address.');
-        }
+        const isValid = (/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(this.state.address.email));
+        
+        this.setState({
+            errors: {
+                ...this.state.errors,
+                email: !isValid
+            }
+        });
+
+        return isValid;
     }
 
-    recaptchaOnChange = (value) => {
-        console.log(value);
-        this.setState({recaptchaToken: value});
+    validateAddress = () => {
+        this.setState({
+            errors: {
+                ...this.state.errors,
+                recipient_name: !this.state.address.recipient_name,
+                line1:!this.state.address.line1,
+                city:!this.state.address.city,
+                state:!this.state.address.state,
+                postal_code:!this.state.address.postal_code,
+            }
+        });
+
+        return !Object.keys(this.state.errors).some(x => this.state.errors[x])
+    }
+
+    validateRecaptcha = () => {
+        return true && this.state.recaptchaToken;
+    }
+
+    doValidation = () => {
+        const emailValid = this.validateEmail();
+        const captchaValid = this.validateRecaptcha();
+        const addressValid = this.validateAddress();
+        const allValid = emailValid && captchaValid && addressValid;
+       
+        this.setState({isFormValid: allValid});
+        return allValid;
+    }
+
+    paypalValidation = () => {
+        if(!this.doValidation()) {
+            this.showPopupMessage('Please complete all required fields');
+            return;
+        }
     }
 
     orderSubtotal = () => {
@@ -100,6 +171,10 @@ export default class Cart extends Component {
         });
 
         return totalCost;
+    }
+
+    recaptchaOnChange = (value) => {
+        this.setState({recaptchaToken: value});
     }
 
     toCurrency = (num) => {
@@ -121,18 +196,16 @@ export default class Cart extends Component {
     }
 
     orderwithother = () => {
-        if(this.state.isFormValid) {
-            var myOrder = this.state.order;
-            myOrder.paymentType = "other (payment pending)";
-            this.submitOrder(myOrder);
-        } else {
-            this.showPopupMessage("Please make sure your email is valid.")
+        if(!this.doValidation()) {
+            this.showPopupMessage('Please complete all required fields');
+            return;
         }
+        var myOrder = this.state.order;
+        myOrder.paymentType = "other (payment pending)";
+        this.submitOrder(myOrder);
     }
 
     orderwithpaypal = (details, data) => {
-        console.log(details);
-        console.log(data);
         var myOrder = this.state.order;
         if(details.status === "COMPLETED") {
             myOrder.paymentType = "Paypal(Paid). Order Number: " + details.id;
@@ -146,13 +219,7 @@ export default class Cart extends Component {
         return (taxed ? this.state.order.tax : 0) + this.state.order.subtotal + this.state.order.shippingcost
     }
 
-    paypalInit = (data, actions) => {
-        actions.disable();
-        this.setState({paypalButtonActions: actions});
-    }
-
     submitOrder = (order) => {
-
         var myOrder = order;
         myOrder.recaptchaToken = this.state.recaptchaToken;
         myOrder.totalTaxed = myOrder.subtotal + myOrder.tax + myOrder.shippingcost;
@@ -171,8 +238,8 @@ export default class Cart extends Component {
         })
     }
 
-    render = () =>
-    <div className="order">
+    render = () =>{
+    return <div className="order">
         {this.state.showpopup && <Popup handleClose={this.hidePopup}><pre>{this.state.popupMessage}</pre></Popup> }
             {this.cartIsEmpty() && <h3 className="cart">Your Shopping cart is empty</h3>}
         <div className="cart">
@@ -197,27 +264,30 @@ export default class Cart extends Component {
             <div><div>Total (MN):</div><div>{this.toCurrency(this.state.order.subtotal + this.state.order.shippingcost + this.state.order.tax)}</div></div>
         </div>}
         {this.state.showorder && <div className="address">
-            <input value={this.state.address.recipient_name  || ''} name="recipient_name" onChange={this.handleChange} type="name" className="full" placeholder="Name" />
-            <input value={this.state.address.phone || ''} name="phone" onChange={this.handleChange} type="tel" className="half" placeholder="Phone Number"/>
-            <input value={this.state.address.email || ''} name="email" onChange={this.handleChange} type="email" className="half" placeholder="E-Mail Address" id='email'/>
-            <input value={this.state.address.line1 || ''} name="line1" onChange={this.handleChange} type="street" className="full" placeholder="Street" />
-            <input value={this.state.address.city || ''} name="city" onChange={this.handleChange} type="city" className="third" placeholder="City" />
-            <input value={this.state.address.state || ''} name="state" onChange={this.handleChange} type="state" className="third" placeholder="State" />
-            <input value={this.state.address.postal_code || ''} name="postal_code" onChange={this.handleChange} type="zip"  className="third" placeholder="Zip" />
+            <input value={this.state.address.recipient_name  || ''} name="recipient_name"   onChange={this.handleChange} type="name"    className={`full  ${this.shouldMarkError('recipient_name') ? "error" : ""}`}onBlur={this.handleBlur} placeholder="Name" />
+            <input value={this.state.address.phone || ''}           name="phone"            onChange={this.handleChange} type="tel"     className={`half  ${this.shouldMarkError('phone') ? "error" : ""}`}         onBlur={this.handleBlur} placeholder="Phone Number"/>
+            <input value={this.state.address.email || ''}           name="email"            onChange={this.handleChange} type="email"   className={`half  ${this.shouldMarkError('email') ? "error" : ""}`}         onBlur={this.handleBlur} placeholder="E-Mail Address" id='email'/>
+            <input value={this.state.address.line1 || ''}           name="line1"            onChange={this.handleChange} type="street"  className={`full  ${this.shouldMarkError('line1') ? "error" : ""}`}         onBlur={this.handleBlur} placeholder="Street" />
+            <input value={this.state.address.city || ''}            name="city"             onChange={this.handleChange} type="city"    className={`third ${this.shouldMarkError('city') ? "error" : ""}`}          onBlur={this.handleBlur} placeholder="City" />
+            <input value={this.state.address.state || ''}           name="state"            onChange={this.handleChange} type="state"   className={`third ${this.shouldMarkError('state') ? "error" : ""}`}         onBlur={this.handleBlur} placeholder="State" />
+            <input value={this.state.address.postal_code || ''}     name="postal_code"      onChange={this.handleChange} type="zip"     className={`third ${this.shouldMarkError('postal_code') ? "error" : ""}`}   onBlur={this.handleBlur} placeholder="Zip" />
         </div>}
         {this.state.showorder && <div className="message">
-        <textarea value={this.state.address.message || ''} name="message" onChange={this.handleChange} placeholder="Message for Jan" />
+            <textarea value={this.state.address.message || ''}      name="message"          onChange={this.handleChange} placeholder="Message for Jan" />
         </div>}
         {this.state.showorder && <div className="buttons">
             <div>Include MN tax: <input type='checkbox' checked={this.state.useMnTax} onChange={(e) => this.setState({useMnTax: e.target.checked})} /></div>
             <PayPalButton   amount={this.paypalOrderAmount(this.state.useMnTax)} 
-                            shippingPreference='NO_SHIPPING' 
+                            shippingPreference='NO_SHIPPING'
+                            disabled={!this.state.isFormValid}
+                            onClick={this.paypalValidation}
                             onSuccess={(details, data) => this.orderwithpaypal(details, data)} 
                             onInit={(data, actions) => this.paypalInit(data, actions)}
                             style={{height: 25, layout: 'horizontal', color: 'blue', shape: 'rect', tagline: 'false'}} 
                             options={{clientId:this.state.order.clientId}} />
-            <button disabled={!this.state.isFormValid} onClick={this.orderwithother}>Pay with other</button>
+            <button onClick={this.orderwithother}>Pay with other</button>
             <ReCAPTCHA onChange={this.recaptchaOnChange} sitekey={RECAPTCHA_KEY} />
         </div>}    
     </div>
+    }
 }
