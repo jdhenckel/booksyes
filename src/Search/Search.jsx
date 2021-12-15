@@ -1,42 +1,32 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Search.css';
 
 export default function Search(props) {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [scrolled, setScrolled] = useState(false);
+    const navigate = useNavigate();
 
-    const searchFor = (e) => {
-        e.preventDefault();
-        console.log('You searched for: ' + searchTerm);
-        props.searchCallback(searchTerm);
+    const searchFor = () => {
+        navigate(`./catalog/search/${searchTerm ?? "*"}`);
     }
 
-    const browseCategories = (e) => {
-        e.preventDefault();
-        console.log('You clicked categories.');
-        props.categoriesCallBack();
+    const browseCategories = () => {
+        navigate(`./categories`);
     }
 
-    const searchRecent = (e) => {
-        e.preventDefault();
-        props.recentCallback();
-        console.log('You clicked recent.');
+    const searchRecent = () => {
+        navigate(`./catalog/recent/recent`);
     }
 
-    const searchPhoto = (e) => {
-        e.preventDefault();
-        props.hasPhotoCallback();
-        console.log('You clicked photos.');
-    }
-
-    const onChange = (e) => {
-        setSearchTerm(e.target.value);
+    const searchPhoto = () => {
+        navigate(`./catalog/photos/has`);
     }
 
     const keydownHandler = (e) => {
         if (e.key === 'Enter') {
-            props.searchCallback(searchTerm);
+            searchFor();
         }
     }
 
@@ -61,8 +51,8 @@ export default function Search(props) {
         <div>
             <div className="search">
                 <div>
-                    <button onClick={props.cartCallback}>View My Cart ({props.cartcount || "0"})</button>
-                    <input type="text" className="field" placeholder="Search for" onChange={onChange} onKeyDown={keydownHandler} value={searchTerm}></input>
+                    <button onClick={() => navigate("/cart")}>View My Cart ({props.cartcount || "0"})</button>
+                    <input type="text" className="field" placeholder="Search for" onChange={(e) => setSearchTerm(e.target.value)} onKeyDown={keydownHandler} value={searchTerm}></input>
                     <button className="gobutton" onClick={searchFor}></button>
                 </div>
                 <div>

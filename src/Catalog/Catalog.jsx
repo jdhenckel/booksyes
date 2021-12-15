@@ -1,40 +1,64 @@
-import React, { Component } from "react";
+import axios from "axios";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import BookEntry from "./BookEntry";
 import CartButton from "./CartButton";
 import "./Catalog.css";
 
-export default class Catalog extends Component {
-    constructor(props) {
-        super (props);
-        this.state = {
-            books: props.books ?? [],
-            cart: props.cart ?? [],
+export default function Catalog(props) {
+
+    const [books, setBooks] = useState([]);
+    const cart = useState(props.cart ?? []);
+
+    const {type, query} = useParams();
+
+
+    useEffect(() => {
+        var url = '';
+        switch(type) {
+            case 'category':
+                url = `/.netlify/functions/bycategory?query=${query ?? ''}`
+                break;
+            case 'recent':
+                url = '/.netlify/functions/new';
+                break;
+            case 'photos':
+                url = '/.netlify/functions/hasphoto';
+                break;
+            case 'search':
+                url = `/.netlify/functions/search?query=${query === '*' ? '' : query ?? ''}`
+                break;
+            default:
+                return;
         }
+
+        axios.get(url)
+        .then(res => {
+            handleResponse(res);
+        });
+    }, [type, query]);
+
+    const handleResponse = (res) => {
+        setBooks(res.data.books);
     }
 
-    componentWillReceiveProps(nextProps) {
-        this.setState({ books: nextProps.books });  
-    }
-    
-    changeCart = (removeFlag, book) => {
-        this.props.changeCart(removeFlag, book);
+    const changeCart = (removeFlag, book) => {
+        props.changeCart(removeFlag, book);
     }
 
-    inCart = (book) => {
-        return this.state.cart.some(e => e.search === book.search);
+    const inCart = (book) => {
+        return cart.some(e => e.search === book.search);
     }
 
-    render() {
-        return(
-            <div className="catalog">
-                {(this.state.books === undefined || this.state.books.length === 0) && <h3>This query returned no results.</h3>}
-                {this.state.books.map((b, index) => (
-                    <div key={index} className={index % 2 === 0 ? "bookContainer even" : "bookContainer odd"}>
-                        <CartButton inCart={this.inCart(b)} clickCallback={(action) => this.changeCart(action, b)} />
-                        <BookEntry book={b}></BookEntry>
-                    </div>
-                ))}
-            </div>
-        );
-    }
+    return(
+        <div className="catalog">
+            {(books === undefined || books.length === 0) && <h3>This query returned no results.</h3>}
+            {books.map((b, index) => (
+                <div key={index} className={index % 2 === 0 ? "bookContainer even" : "bookContainer odd"}>
+                    <CartButton inCart={inCart(b)} clickCallback={(action) => changeCart(action, b)} />
+                    <BookEntry book={b}></BookEntry>
+                </div>
+            ))}
+        </div>
+    );
 }

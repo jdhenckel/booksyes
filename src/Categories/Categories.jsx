@@ -1,22 +1,27 @@
-import React, {Component} from "react";
+import axios from "axios";
+import React, {useState, useEffect} from "react";
+import { useNavigate } from 'react-router-dom';
 import './Categories.css';
 
-export default class Categories extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            categoryList: props.categories ?? [],
-        }
+export default function Categories(props) {
+    const [categoryList, setCategoryList] = useState([]);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        axios.get('/.netlify/functions/categories')
+        .then(response => {
+            const categories = response.data.categories;
+            setCategoryList(categories);
+        })
+    }, []);
+
+    const pickCategory = (category) => {
+        navigate(`../catalog/category/${category}`)
     }
 
-    pickCategory = (category) => {
-        this.props.pickCallback(category);
-    }
-
-    render = () =>
-    <div className="categories">
-        {this.state.categoryList.map((c, index) => (
-            <button className={index % 2 === 0 ? "even" : "odd"} key={index} onClick={() => this.pickCategory(c)}>{c}</button>
+    return <div className="categories">
+        {categoryList.map((c, index) => (
+            <button className={index % 2 === 0 ? "even" : "odd"} key={index} onClick={() => pickCategory(c)}>{c}</button>
             ))}
     </div>
 }

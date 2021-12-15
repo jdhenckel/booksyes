@@ -1,4 +1,5 @@
-import React, {Component} from 'react';
+import React, {useEffect, useState} from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Cart.css';
 import Popup from '../popup/popup.jsx';
@@ -8,286 +9,243 @@ import debounce from 'lodash.debounce';
 
 const RECAPTCHA_KEY = '6LerI6EdAAAAANsjsZnGhftz1zV03RsIee47LukQ';
 
-export default class Cart extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            books: props.cart ?? [],
-            order: {},
-            showorder: false,
-            address: {
-                recipient_name: '',
-                line1:'',
-                city:'',
-                state:'',
-                postal_code:'',
-                email: '',
-            },
-            touched: {
-                recipient_name: false,
-                line1:false,
-                city:false,
-                state:false,
-                postal_code:false,
-                email: false,
-            },
-            errors: {
-                recipient_name: false,
-                line1:false,
-                city:false,
-                state:false,
-                postal_code:false,
-                email: false
-            },
-            showpopup: false,
-            popupMessage: "",
-            orderSuccess: false,
-            useMnTax: true,
-            isFormValid: false,
-            paypalButtonActions: {},
-            recaptchaToken: '',
-            debouncedValidate: debounce(this.doValidation, 500)
-        }
-    }
+export default function Cart(props) {
+    const [books, setBooks] = useState(props.cart ?? []);
+    const [order, setOrder] = useState({});
+    const [showorder, setShoworder] = useState(false);
+    const [address, setAddress] = useState({
+        recipient_name: '',
+        line1: '',
+        city: '',
+        state: '',
+        postal_code: '',
+        email: '',
+    });
+    const [touched, setTouched] = useState({
+        recipient_name: false,
+        line1: false,
+        city: false,
+        state: false,
+        postal_code: false,
+        email: false,
+    });
+    const [errors, setErrors] = useState({
+        recipient_name: false,
+        line1: false,
+        city: false,
+        state: false,
+        postal_code: false,
+        email: false
+    });
+    const [showpopup, setShowpopup] = useState(false);
+    const [popupMessage, setPopupMessage] = useState('');
+    const [useMnTax, setUseMTax] = useState(true);
+    const [isFormValid, setIsFormVaild] = useState(false);
+    const [recaptchaToken, setRecaptchToken] = useState('');
 
-    cartIsEmpty = () => (this.state.books === undefined || this.state.books.length === 0);
-
-    hidePopup = () => {
-        this.setState({
-            showpopup: false,
-        });
-    }
-
-    showSuccessMessage = () => {
-        const booksToRemove = [...this.state.books];
-        booksToRemove.forEach((b) => this.changeCart(true, b));
-        this.setState({
-            showorder: false,
-        });
-
-        this.props.successCallback();
-    }
-
-    showPopupMessage = (message) => {
-        this.setState({
-            showpopup: true,
-            popupMessage: message,
-        });
-    }
-
-    componentWillReceiveProps(nextProps) {
-        this.setState({ books: nextProps.cart }); 
-    }
-
-    changeCart = (removeFlag, book) => {
-        this.props.changeCart(removeFlag, book);
-    }
-
-    handleChange = (event) => {
-        const name = event.target.name;
-        const value = event.target.value;
-        this.setState({
-            address: {
-                ...this.state.address,
-                [name]:value,
-            },
-            isFormValid: false,
-        });
-
-        this.state.debouncedValidate();
-    }
-
-    handleBlur = (event) => {
-        const name = event.target.name;
-        this.setState({
-            touched: {
-                ...this.state.touched,
-                [name]: true,
-            }
-        });
-
-        this.state.debouncedValidate();
-    }
-
-    shouldMarkError = (field) => {
-        const hasError = this.state.errors[field];
-        const isTouched = this.state.touched[field];
-        return isTouched && hasError;
-    }
-
-    validateEmail = () => {
-        const isValid = (/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(this.state.address.email));
+    const navigate = useNavigate();
+    
+    const doValidation = () => {
         
-        this.setState({
-            errors: {
-                ...this.state.errors,
-                email: !isValid
-            }
-        });
-
-        return isValid;
-    }
-
-    validateAddress = () => {
-        this.setState({
-            errors: {
-                ...this.state.errors,
-                recipient_name: !this.state.address.recipient_name,
-                line1:!this.state.address.line1,
-                city:!this.state.address.city,
-                state:!this.state.address.state,
-                postal_code:!this.state.address.postal_code,
-            }
-        });
-
-        return !Object.keys(this.state.errors).some(x => this.state.errors[x])
-    }
-
-    validateRecaptcha = () => {
-        return true && this.state.recaptchaToken;
-    }
-
-    doValidation = () => {
-        const emailValid = this.validateEmail();
-        const captchaValid = this.validateRecaptcha();
-        const addressValid = this.validateAddress();
-        const allValid = emailValid && captchaValid && addressValid;
+        const captchaValid = validateRecaptcha();
+        const addressValid = validateAddress();
+        const allValid = captchaValid && addressValid;
        
-        this.setState({isFormValid: allValid});
+        setIsFormVaild(allValid);
         return allValid;
     }
 
-    paypalValidation = () => {
-        if(!this.doValidation()) {
-            this.showPopupMessage('Please complete all required fields');
+    const debouncedValidate = debounce(doValidation, 500);
+
+    const cartIsEmpty = () => (books === undefined || books.length === 0);
+
+    const hidePopup = () => {
+        setShowpopup(false);
+    }
+
+    const showSuccessMessage = () => {
+        const booksToRemove = [...books];
+        booksToRemove.forEach((b) => changeCart(true, b));
+        setShoworder(false);
+
+        navigate("/success");
+    }
+
+    const showPopupMessage = (message) => {
+        setShowpopup(true);
+        setPopupMessage(message);
+    }
+
+    useEffect(() => {
+        setBooks(books)
+    }, [books])
+
+
+    const changeCart = (removeFlag, book) => {
+        props.changeCart(removeFlag, book);
+    }
+
+    const handleChange = (event) => {
+        const name = event.target.name;
+        const value = event.target.value;
+        setAddress({
+            ...address,
+            [name]:value});
+        setIsFormVaild(false);
+
+        debouncedValidate();
+    }
+
+    const handleBlur = (event) => {
+        const name = event.target.name;
+        setTouched({
+            ...touched,
+            [name]: true,
+        });
+
+        debouncedValidate();
+    }
+
+    const shouldMarkError = (field) => {
+        const hasError = errors[field];
+        const isTouched = touched[field];
+        return isTouched && hasError;
+    }
+
+    const validateAddress = () => {
+        const isEmailValid = (/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(address.email));
+        
+        setErrors({
+            recipient_name: !address.recipient_name,
+            line1:!address.line1,
+            city:!address.city,
+            state:!address.state,
+            postal_code:!address.postal_code,
+            email: !isEmailValid,
+        });
+
+        return !Object.keys(errors).some(x => errors[x])
+    }
+
+    const validateRecaptcha = () => {
+        return true && recaptchaToken;
+    }
+
+    const paypalValidation = () => {
+        if(!doValidation()) {
+            showPopupMessage('Please complete all required fields');
             return;
         }
     }
 
-    orderSubtotal = () => {
-        var totalCost = 0;
-        this.state.books.forEach(b => {
-            totalCost += Number.parseFloat(b.price);
-        });
-
-        return totalCost;
+    const recaptchaOnChange = (value) => {
+        setRecaptchToken(value);
     }
 
-    recaptchaOnChange = (value) => {
-        this.setState({recaptchaToken: value});
-    }
-
-    toCurrency = (num) => {
+    const toCurrency = (num) => {
         return '$' + Number.parseFloat(num).toFixed(2)
     }
 
-    getOrder = () => {
+    const getOrder = () => {
         //call the server with all the data and get a total
-        axios.post("/.netlify/functions/getorder", { books: this.state.books })
+        axios.post("/.netlify/functions/getorder", { books: books })
         .then(response => {
-            console.log(response.data);
-            this.setState((state, props) => {
-                return {
-                    order: response.data.order,
-                    showorder: true
-                }
-            });
+            setOrder(response.data.order);
+            setShoworder(true);
         }).catch(error => console.log(error));
     }
 
-    orderwithother = () => {
-        if(!this.doValidation()) {
-            this.showPopupMessage('Please complete all required fields');
+    const orderwithother = () => {
+        if(!doValidation()) {
+            showPopupMessage('Please complete all required fields');
             return;
         }
-        var myOrder = this.state.order;
+        var myOrder = order;
         myOrder.paymentType = "other (payment pending)";
-        this.submitOrder(myOrder);
+        submitOrder(myOrder);
     }
 
-    orderwithpaypal = (details, data) => {
-        var myOrder = this.state.order;
+    const orderwithpaypal = (details, data) => {
+        var myOrder = order;
         if(details.status === "COMPLETED") {
             myOrder.paymentType = "Paypal(Paid). Order Number: " + details.id;
-            this.submitOrder(myOrder);
+            submitOrder(myOrder);
         } else {
-            this.showPopupMessage(`There was a problem with your paypal payment.`);
+            showPopupMessage(`There was a problem with your paypal payment.`);
         }
     }
 
-    paypalOrderAmount = (taxed) => {
-        return (taxed ? this.state.order.tax : 0) + this.state.order.subtotal + this.state.order.shippingcost
+    const paypalOrderAmount = (taxed) => {
+        return (taxed ? order.tax : 0) + order.subtotal + order.shippingcost
     }
 
-    submitOrder = (order) => {
+    const submitOrder = (order) => {
         var myOrder = order;
-        myOrder.recaptchaToken = this.state.recaptchaToken;
+        myOrder.recaptchaToken = recaptchaToken;
         myOrder.totalTaxed = myOrder.subtotal + myOrder.tax + myOrder.shippingcost;
         myOrder.totalTaxed = Math.round((myOrder.totalTaxed + Number.EPSILON) * 100) / 100;
         myOrder.totalUntaxed = myOrder.subtotal + myOrder.shippingcost;
-        myOrder.shippingAddress = this.state.address;
+        myOrder.shippingAddress = address;
         axios.post('/.netlify/functions/placeorder', {
             body: {order: order},
         }).then(response => {
             console.log(response);
-            this.showSuccessMessage();
+            showSuccessMessage();
         }).catch(error => {
             console.log(error);
             window.grecaptcha.reset();
-            this.showPopupMessage(`ERROR ${error.response.status}:\n${error.response.data}`);
+            showPopupMessage(`ERROR ${error.response.status}:\n${error.response.data}`);
         })
     }
 
-    render = () =>{
+
     return <div className="order">
-        {this.state.showpopup && <Popup handleClose={this.hidePopup}><pre>{this.state.popupMessage}</pre></Popup> }
-            {this.cartIsEmpty() && <h3 className="cart">Your Shopping cart is empty</h3>}
+        {showpopup && <Popup handleClose={hidePopup}><pre>{popupMessage}</pre></Popup> }
+            {cartIsEmpty() && <h3 className="cart">Your Shopping cart is empty</h3>}
         <div className="cart">
-            {!this.cartIsEmpty() && <div>
-                 <button onClick={this.getOrder}>{this.state.showorder ? "Update Cart" : "Check out"}</button>
+            {!cartIsEmpty() && <div>
+                 <button onClick={getOrder}>{showorder ? "Update Cart" : "Check out"}</button>
             </div>}
-            {this.state.books.map((book, index) => (
+            {books.map((book, index) => (
                 <div key={index} className={index % 2 === 0 ? "even" : "odd"}>
-                    <button onClick={() => this.changeCart(true, book)}>Remove from Cart</button>
+                    <button onClick={() => changeCart(true, book)}>Remove from Cart</button>
                     <div>{book.author}</div>
                     <div>{book.title}</div>
-                    <div>{this.toCurrency(book.price)}</div>
+                    <div>{toCurrency(book.price)}</div>
                 </div>
             ))}
             
         </div>
-        {this.state.showorder && <div className="confirm">
-            <div><div>Subtotal:</div><div>{this.toCurrency(this.state.order.subtotal)}</div></div>
-            <div><div>Shipping:</div><div>{this.toCurrency(this.state.order.shippingcost)}</div></div>
-            <div><div>MN Tax:</div><div>{this.toCurrency(this.state.order.tax)}</div></div>
-            <div><div>Total (non-MN):</div><div>{this.toCurrency(this.state.order.subtotal + this.state.order.shippingcost)}</div></div>
-            <div><div>Total (MN):</div><div>{this.toCurrency(this.state.order.subtotal + this.state.order.shippingcost + this.state.order.tax)}</div></div>
+        {showorder && <div className="confirm">
+            <div><div>Subtotal:</div><div>{toCurrency(order.subtotal)}</div></div>
+            <div><div>Shipping:</div><div>{toCurrency(order.shippingcost)}</div></div>
+            <div><div>MN Tax:</div><div>{toCurrency(order.tax)}</div></div>
+            <div><div>Total (non-MN):</div><div>{toCurrency(order.subtotal + order.shippingcost)}</div></div>
+            <div><div>Total (MN):</div><div>{toCurrency(order.subtotal + order.shippingcost + order.tax)}</div></div>
         </div>}
-        {this.state.showorder && <div className="address">
-            <input value={this.state.address.recipient_name  || ''} name="recipient_name"   onChange={this.handleChange} type="name"    className={`full  ${this.shouldMarkError('recipient_name') ? "error" : ""}`}onBlur={this.handleBlur} placeholder="Name" />
-            <input value={this.state.address.phone || ''}           name="phone"            onChange={this.handleChange} type="tel"     className={`half  ${this.shouldMarkError('phone') ? "error" : ""}`}         onBlur={this.handleBlur} placeholder="Phone Number"/>
-            <input value={this.state.address.email || ''}           name="email"            onChange={this.handleChange} type="email"   className={`half  ${this.shouldMarkError('email') ? "error" : ""}`}         onBlur={this.handleBlur} placeholder="E-Mail Address" id='email'/>
-            <input value={this.state.address.line1 || ''}           name="line1"            onChange={this.handleChange} type="street"  className={`full  ${this.shouldMarkError('line1') ? "error" : ""}`}         onBlur={this.handleBlur} placeholder="Street" />
-            <input value={this.state.address.city || ''}            name="city"             onChange={this.handleChange} type="city"    className={`third ${this.shouldMarkError('city') ? "error" : ""}`}          onBlur={this.handleBlur} placeholder="City" />
-            <input value={this.state.address.state || ''}           name="state"            onChange={this.handleChange} type="state"   className={`third ${this.shouldMarkError('state') ? "error" : ""}`}         onBlur={this.handleBlur} placeholder="State" />
-            <input value={this.state.address.postal_code || ''}     name="postal_code"      onChange={this.handleChange} type="zip"     className={`third ${this.shouldMarkError('postal_code') ? "error" : ""}`}   onBlur={this.handleBlur} placeholder="Zip" />
+        {showorder && <div className="address">
+            <input value={address.recipient_name  || ''} name="recipient_name"   onChange={handleChange} type="name"    className={`full  ${shouldMarkError('recipient_name') ? "error" : ""}`}onBlur={handleBlur} placeholder="Name" />
+            <input value={address.phone || ''}           name="phone"            onChange={handleChange} type="tel"     className={`half  ${shouldMarkError('phone') ? "error" : ""}`}         onBlur={handleBlur} placeholder="Phone Number"/>
+            <input value={address.email || ''}           name="email"            onChange={handleChange} type="email"   className={`half  ${shouldMarkError('email') ? "error" : ""}`}         onBlur={handleBlur} placeholder="E-Mail Address" id='email'/>
+            <input value={address.line1 || ''}           name="line1"            onChange={handleChange} type="street"  className={`full  ${shouldMarkError('line1') ? "error" : ""}`}         onBlur={handleBlur} placeholder="Street" />
+            <input value={address.city || ''}            name="city"             onChange={handleChange} type="city"    className={`third ${shouldMarkError('city') ? "error" : ""}`}          onBlur={handleBlur} placeholder="City" />
+            <input value={address.state || ''}           name="state"            onChange={handleChange} type="state"   className={`third ${shouldMarkError('state') ? "error" : ""}`}         onBlur={handleBlur} placeholder="State" />
+            <input value={address.postal_code || ''}     name="postal_code"      onChange={handleChange} type="zip"     className={`third ${shouldMarkError('postal_code') ? "error" : ""}`}   onBlur={handleBlur} placeholder="Zip" />
         </div>}
-        {this.state.showorder && <div className="message">
-            <textarea value={this.state.address.message || ''}      name="message"          onChange={this.handleChange} placeholder="Message for Jan" />
+        {showorder && <div className="message">
+            <textarea value={address.message || ''}      name="message"          onChange={handleChange} placeholder="Message for Jan" />
         </div>}
-        {this.state.showorder && <div className="buttons">
-            <div>Include MN tax: <input type='checkbox' checked={this.state.useMnTax} onChange={(e) => this.setState({useMnTax: e.target.checked})} /></div>
-            <PayPalButton   amount={this.paypalOrderAmount(this.state.useMnTax)} 
+        {showorder && <div className="buttons">
+            <div>Include MN tax: <input type='checkbox' checked={useMnTax} onChange={(e) => setUseMTax(e.target.checked)} /></div>
+            <PayPalButton   amount={paypalOrderAmount(useMnTax)} 
                             shippingPreference='NO_SHIPPING'
-                            disabled={!this.state.isFormValid}
-                            onClick={this.paypalValidation}
-                            onSuccess={(details, data) => this.orderwithpaypal(details, data)} 
-                            onInit={(data, actions) => this.paypalInit(data, actions)}
+                            disabled={!isFormValid}
+                            onClick={paypalValidation}
+                            onSuccess={(details, data) => orderwithpaypal(details, data)} 
                             style={{height: 25, layout: 'horizontal', color: 'blue', shape: 'rect', tagline: 'false'}} 
-                            options={{clientId:this.state.order.clientId}} />
-            <button onClick={this.orderwithother}>Pay with other</button>
-            <ReCAPTCHA onChange={this.recaptchaOnChange} sitekey={RECAPTCHA_KEY} />
+                            options={{clientId:order.clientId}} />
+            <button onClick={orderwithother}>Pay with other</button>
+            <ReCAPTCHA onChange={recaptchaOnChange} sitekey={RECAPTCHA_KEY} />
         </div>}    
     </div>
-    }
 }
