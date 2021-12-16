@@ -1,12 +1,13 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import Spinner from "../Spinner/Spinner";
 import BookEntry from "./BookEntry";
 import CartButton from "./CartButton";
 import "./Catalog.css";
 
 export default function Catalog(props) {
-
+    const [loading, setLoading] = useState(false);
     const [books, setBooks] = useState([]);
     const cart = useState(props.cart ?? []);
 
@@ -31,10 +32,12 @@ export default function Catalog(props) {
             default:
                 return;
         }
-
+        setLoading(true);
         axios.get(url)
         .then(res => {
             handleResponse(res);
+        }).finally(() => {
+            setLoading(false);
         });
     }, [type, query]);
 
@@ -52,13 +55,16 @@ export default function Catalog(props) {
 
     return(
         <div className="catalog">
-            {(books === undefined || books.length === 0) && <h3>This query returned no results.</h3>}
-            {books.map((b, index) => (
-                <div key={index} className={index % 2 === 0 ? "bookContainer even" : "bookContainer odd"}>
-                    <CartButton inCart={inCart(b)} clickCallback={(action) => changeCart(action, b)} />
-                    <BookEntry book={b}></BookEntry>
-                </div>
-            ))}
+            <Spinner loading={loading} >
+                {(books === undefined || books.length === 0) && <h3>This query returned no results.</h3>}
+                
+                {books.map((b, index) => (
+                    <div key={index} className={index % 2 === 0 ? "bookContainer even" : "bookContainer odd"}>
+                        <CartButton inCart={inCart(b)} clickCallback={(action) => changeCart(action, b)} />
+                        <BookEntry book={b}></BookEntry>
+                    </div>
+                ))}
+            </Spinner>
         </div>
     );
 }

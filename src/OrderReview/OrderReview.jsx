@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import Popup from '../popup/popup.jsx';
 import Order from './Order.jsx';
 import './OrderReview.css';
+import Spinner from '../Spinner/Spinner.jsx';
 
 
 export default function OrderReview(props) {
@@ -11,6 +12,7 @@ export default function OrderReview(props) {
     const [orders, setOrders] = useState([]);
     const [showpopup, setShowpopup] = useState(false);
     const [popupMessage, setPopupMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         if(e.target.name === 'password') setPassword(e.target.value);
@@ -18,13 +20,14 @@ export default function OrderReview(props) {
     };
 
     const getOrders = () => {
+        setLoading(true);
         axios.post(`/.netlify/functions/revieworders?action=view${showDeleted ? '&showDeleted=true' : ''}`, { pass: password })
             .then(res => {
                 setOrders(res.data);
             }).catch(error => {
                 showPopupMessage(`ERROR ${error.response.status}:\n${error.response.data}`);
                 setPassword('');
-            })
+            }).finally(() => setLoading(false))
     }
 
     const showPopupMessage = (message) => {
@@ -53,6 +56,7 @@ export default function OrderReview(props) {
             <button onClick={getOrders}>Review Orders</button>
             Show Deleted: <input type='checkbox' onChange={handleChange} name='showdeleted' />
         </div>
+        <Spinner loading={loading} />
         {orders.length !== 0 ? orders.map((order, index) => 
             <Order order={order} key={index} deleteOrder={(orderNumber) => deleteOrder(orderNumber)} />
         ): <h3>No orders.  Use "show deleted" to see deleted orders.</h3>}

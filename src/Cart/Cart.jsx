@@ -6,6 +6,7 @@ import Popup from '../popup/popup.jsx';
 import { PayPalButton } from 'react-paypal-button-v2';
 import ReCAPTCHA from 'react-google-recaptcha';
 import debounce from 'lodash.debounce';
+import Spinner from '../Spinner/Spinner';
 
 const RECAPTCHA_KEY = '6LerI6EdAAAAANsjsZnGhftz1zV03RsIee47LukQ';
 
@@ -42,6 +43,7 @@ export default function Cart(props) {
     const [useMnTax, setUseMTax] = useState(true);
     const [isFormValid, setIsFormVaild] = useState(false);
     const [recaptchaToken, setRecaptchToken] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
     
@@ -147,12 +149,16 @@ export default function Cart(props) {
     }
 
     const getOrder = () => {
+        setLoading(true);
         //call the server with all the data and get a total
         axios.post("/.netlify/functions/getorder", { books: books })
         .then(response => {
             setOrder(response.data.order);
             setShoworder(true);
-        }).catch(error => console.log(error));
+        }).catch(error => console.log(error))
+        .finally(() => {
+            setLoading(false);
+        });
     }
 
     const orderwithother = () => {
@@ -186,6 +192,7 @@ export default function Cart(props) {
         myOrder.totalTaxed = Math.round((myOrder.totalTaxed + Number.EPSILON) * 100) / 100;
         myOrder.totalUntaxed = myOrder.subtotal + myOrder.shippingcost;
         myOrder.shippingAddress = address;
+        setLoading(true);
         axios.post('/.netlify/functions/placeorder', {
             body: {order: order},
         }).then(response => {
@@ -195,16 +202,20 @@ export default function Cart(props) {
             console.log(error);
             window.grecaptcha.reset();
             showPopupMessage(`ERROR ${error.response.status}:\n${error.response.data}`);
+        }).finally(() => {
+            setLoading(false);
         })
     }
 
 
     return <div className="order">
         {showpopup && <Popup handleClose={hidePopup}><pre>{popupMessage}</pre></Popup> }
-            {cartIsEmpty() && <h3 className="cart">Your Shopping cart is empty</h3>}
+        {cartIsEmpty() && <h3 className="cart">Your Shopping cart is empty</h3>}
+        
         <div className="cart">
             {!cartIsEmpty() && <div>
                  <button onClick={getOrder}>{showorder ? "Update Cart" : "Check out"}</button>
+                 <Spinner loading={loading} />
             </div>}
             {books.map((book, index) => (
                 <div key={index} className={index % 2 === 0 ? "even" : "odd"}>

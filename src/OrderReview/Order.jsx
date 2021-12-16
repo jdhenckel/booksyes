@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Spinner from '../Spinner/Spinner';
 
 export default function Order(props) {
     const [waiting, setWaiting] = useState();
@@ -17,11 +18,14 @@ export default function Order(props) {
         <summary>
             <div>
                 {order.shippingAddress.recipient_name}<br />
-                {order.shippingAddress.line1}, {order.shippingAddress.city} {order.shippingAddress.state}, {order.shippingAddress.postal_code}
+                {order.orderNumber}
             </div>
             <div>
                 {order.books.length} {order.books.length === 1 ? ' book': ' books'} <br />
-                <button disabled={waiting} onClick={deleteOrder} className={order.isDeleted ? 'deleted' : ''}>{order.isDeleted ? 'Deleted' : 'Delete'}</button>
+                {waiting? 
+                <Spinner loading={true} /> :
+                <button onClick={deleteOrder} className={order.isDeleted ? 'deleted' : ''}>{order.isDeleted ? 'Deleted' : 'Delete'}</button>
+                }
             </div>
         </summary>
         <div className='dropdown'>
