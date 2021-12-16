@@ -38,12 +38,12 @@ exports.handler = async function(event, context) {
         }
 
         //get ordernumber
-        const ordernum = helpers.getOrderNumber();
+        const orderNumber = helpers.getOrderNumber();
 
         try {
             //write order to database
             const ordersSheet = await initOrdersSheet();
-            await writeOrderToSheet(order, ordernum, ordersSheet);
+            await writeOrderToSheet(order, orderNumber, ordersSheet);
         } catch (error) {
             throw 'There was an problem completing your order. You can try resubmitting it, or contact Jan directly using the link at the bottom of the page';
         }
@@ -53,7 +53,7 @@ exports.handler = async function(event, context) {
             content: {
                 from: 'no-reply@orders.booksofyesterday.com',
                 subject: 'New Books Of Yesterday Order',
-                html: templates.orderNotificationTemplate(exscapedOrder),
+                html: templates.orderNotificationTemplate(exscapedOrder, orderNumber),
             },
             recipients: settings.orderemails.split(',').map((email) => ({address: email})),
         }).then(handleSuccess).catch(handleEmailErrors);
@@ -63,7 +63,7 @@ exports.handler = async function(event, context) {
             content: {
                 from: 'no-reply@orders.booksofyesterday.com',
                 subject: 'Books Of Yesterday Order Confirmation',
-                html: templates.orderConfirmationTemplate(exscapedOrder),
+                html: templates.orderConfirmationTemplate(exscapedOrder, orderNumber),
             },
             recipients: [
                 {address: order.shippingAddress.email,

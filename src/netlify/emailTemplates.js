@@ -1,4 +1,4 @@
-exports.orderNotificationTemplate = (order) => {
+exports.orderNotificationTemplate = (order, orderNumber) => {
 return `
 ${(new Date()).toDateString()}
 <br>From: ${order.shippingAddress.email}
@@ -10,6 +10,7 @@ ${(new Date()).toDateString()}
 <br>${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.postal_code}
 <br>
 <br>PHONE:   ${order.shippingAddress.phone}
+<br>Order Number:   ${orderNumber}
 <br>PAYMENT:   ${order.paymentType}
 <br>TOTAL (taxed):   $ ${order.totalTaxed}
 <br>TOTAL (un-taxed):   $ ${order.totalUntaxed}
@@ -17,21 +18,20 @@ ${(new Date()).toDateString()}
 <br>MESSAGE: 
 <br>${order.shippingAddress.message}
 <br>
+<br>Books in this order:
 <pre>
-======== START OF BOOK LIST =========
 
 ${order.books.map((book) => 
-    book.author + '. ' +
-    book.title + '. ' +
-    book.description + '. ' +
-    book.ISBN + '. ' +
+    book.author + ' ' +
+    book.title + ' ' +
+    book.description + ' ' +
+    book.ISBN + ' ' +
     book.price + '<br><br>'
     )}
-======== END OF BOOK LIST =========
 </pre></i></b>`
 }
 
-exports.orderConfirmationTemplate = (order) => {
+exports.orderConfirmationTemplate = (order, orderNumber) => {
     return `
     <br>Thank you for your order of ${order.books.length} ${order.books.length === 1 ? 'book' : 'books'}
     <br>
@@ -41,14 +41,14 @@ exports.orderConfirmationTemplate = (order) => {
     <br>${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.postal_code}
     <br>
     <br>PAYMENT:   ${order.paymentType}
+    <br>Order Number:   ${orderNumber}
     <br>TOTAL (taxed):   $ ${order.totalTaxed}
     <br>TOTAL (un-taxed):   $ ${order.totalUntaxed}
     <br>
-    <br>If you need to make a change to this order please contact Jan at: phone? email?
+    <br>If you need to make a change to this order please contact Jan at: 763-753-3429 or <a href="mailto:bigt40@aol.com">Email</a>
     <br>
-    <br>
+    <br>Books in this order:
     <pre>
-    ======== START OF BOOK LIST =========
     
     ${order.books.map((book) => 
         book.author + '. ' +
@@ -57,6 +57,5 @@ exports.orderConfirmationTemplate = (order) => {
         book.ISBN + '. ' +
         book.price + '<br><br>'
         )}
-    ======== END OF BOOK LIST =========
     </pre></i></b>`
     }
