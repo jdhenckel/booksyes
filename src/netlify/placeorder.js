@@ -5,11 +5,13 @@ const SparkPost = require('sparkpost');
 const client = new SparkPost(SPARKPOST_API);
 const templates = require('./emailTemplates.js');
 const { default: axios } = require('axios');
+const { GoogleSpreadsheet } = require('google-spreadsheet');
 
 exports.handler = async function(event, context) {
     try {
         const order = JSON.parse(event.body).body.order;
         var exscapedOrder = order;
+        console.log(order);
         escapeAll(exscapedOrder);
 
         const settings = await helpers.getSettings();
@@ -35,8 +37,16 @@ exports.handler = async function(event, context) {
             throw 'Missing some required contact or shipping information.  please correct it and try again.';
         }
 
-        //write order to database
-        //TODO
+        //get ordernumber
+        const ordernum = helpers.getOrderNumber();
+
+        try {
+            //write order to database
+            const ordersSheet = await initOrdersSheet();
+            await writeOrderToSheet(order, ordernum, ordersSheet);
+        } catch (error) {
+            throw 'There was an problem completing your order. You can try resubmitting it, or contact Jan directly using the link at the bottom of the page';
+        }
 
         //send email to jan
         await client.transmissions.send({
@@ -46,7 +56,7 @@ exports.handler = async function(event, context) {
                 html: templates.orderNotificationTemplate(exscapedOrder),
             },
             recipients: settings.orderemails.split(',').map((email) => ({address: email})),
-        }).then(handleSuccess).catch(handleErrors);
+        }).then(handleSuccess).catch(handleEmailErrors);
         
         //send confirmation email to customer
         await client.transmissions.send({
@@ -59,7 +69,7 @@ exports.handler = async function(event, context) {
                 {address: order.shippingAddress.email,
                 name: order.shippingAddress.recipient_name},
             ],
-        }).then(handleSuccess).catch(handleErrors);
+        }).then(handleSuccess).catch(handleEmailErrors);
 
         //return all ok screen
         return {
@@ -74,7 +84,7 @@ exports.handler = async function(event, context) {
     }
 }
 
-function handleErrors(error) {
+function handleEmailErrors(error) {
     console.error(error);
     throw "There was an problem completing your order. You can try resubmitting it, or contact Jan directly using the link at the bottom of the page";
 }
@@ -103,4 +113,33 @@ function escapeAll(object) {
             object[k] = escapeStr(object[k]);
         }
     })
+}
+
+async function initOrdersSheet() {
+    const doc = new GoogleSpreadsheet(process.env.DATABASE_KEY);
+
+    await doc.useServiceAccountAuth({
+        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+        private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+    });
+    await doc.loadInfo();
+    const sheet = doc.sheetsById[process.env.DATABASE_SHEET_ORDERS];
+    await sheet.loadCells();
+    
+    return sheet;
+}
+
+async function writeOrderToSheet(order, orderNumber, sheet) {
+    //resize is 1-indexed
+    await sheet.resize({ rowCount: sheet.rowCount + 1, columnCount: sheet.columnCount});
+    
+    //load the newly created cells
+    await sheet.loadCells();
+    
+    //getcell is 0-indexed
+    sheet.getCell(sheet.rowCount - 1, 0).value = JSON.stringify(order);
+    sheet.getCell(sheet.rowCount - 1, 2).value = orderNumber;
+
+    await sheet.saveUpdatedCells();
+    return;
 }

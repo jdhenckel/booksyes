@@ -25,6 +25,24 @@ exports.buildBooks = (data) => {
     return JSON.stringify(retObj);
 };
 
+exports.buildOrders = (data) => {
+    const table = JSON.parse(data.replace(/^\)]\}'\n/, '')).table;
+    const ordersArr = [];
+
+    for (let r = 0; r < table.rows.length; r++) {
+        const row = table.rows[r];
+        var orderObj = {
+            orderNumber: row.c[2].v,
+            isDeleted: (row.c[1] !== null),
+            ...JSON.parse(row.c[0].v), 
+        }
+
+        ordersArr.push(orderObj);
+    }
+
+    return JSON.stringify(ordersArr);
+}
+
 const buildSettings = exports.buildSettings = (data) => {
     const table = JSON.parse(data.replace(/^\)]\}'\n/, '')).table;
     const settingObj = {};
@@ -40,11 +58,8 @@ const buildSettings = exports.buildSettings = (data) => {
 }
 
 const buildURL = exports.buildURL = (query, sheet) => {
-    const {DATABASE_SHEET_BOOKS} = process.env;
-    const {DATABASE_SHEET_CATEGORIES} = process.env;
-    const {DATABASE_LOCATION} = process.env;
-    const {DATABASE_KEY} = process.env;
-    const {DATABASE_SHEET_SETTINGS} = process.env;
+    const {DATABASE_SHEET_BOOKS, DATABASE_SHEET_ORDERS, DATABASE_SHEET_CATEGORIES, DATABASE_SHEET_SETTINGS} = process.env;
+    const {DATABASE_LOCATION, DATABASE_KEY} = process.env;
 
     var id;
     switch(sheet) {
@@ -56,7 +71,10 @@ const buildURL = exports.buildURL = (query, sheet) => {
             break;
         case "settings":
             id = DATABASE_SHEET_SETTINGS;
-        break;
+            break;
+        case "orders":
+            id = DATABASE_SHEET_ORDERS;
+            break;
     }
 
     const key = "&key=" + DATABASE_KEY;
@@ -67,3 +85,9 @@ const buildURL = exports.buildURL = (query, sheet) => {
 };
 
 exports.getSettings = () => axios.get(buildURL("select *", "settings"), {headers: {'X-DataSource-Auth':""}}).then(response => buildSettings(response.data));
+
+exports.getOrderNumber = () => {
+    const year = (new Date()).getFullYear().toString().slice(-2);
+    const digits = (new Date()).getTime().toString().slice(-6);
+    return year + digits;
+}
