@@ -21,7 +21,7 @@ export default function Main(props) {
         <Outlet />
         <div className="footer sticky bottom">
             <hr />
-            <small><button className="about linklike">About Us</button> | <a href="mailto:bigt40@aol.com">email Jan</a> | <a href="mailto:jdhenckel@gmail.com">email webmaster</a></small>
+            <small><a href="mailto:bigt40@aol.com">Email Jan</a> | <a href="mailto:jdhenckel@gmail.com">Email Webmaster</a></small>
             <hr />
             <small>This way-cool web site developed by <a href="www.poorfox.com">poorfox</a>.</small>
         </div>

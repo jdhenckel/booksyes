@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './Search.css';
 
 export default function Search(props) {
-
+    const [lastCartCount, setLastCartCount] = useState(0);
     const [searchTerm, setSearchTerm] = useState("");
     const [scrolled, setScrolled] = useState(false);
     const navigate = useNavigate();
@@ -31,6 +31,10 @@ export default function Search(props) {
     }
 
     useEffect(() => {
+        setTimeout(() => setLastCartCount(props.cartcount), 1000);
+    }, [props]);
+
+    useEffect(() => {
         const scrollHandler = () => {
             setScrolled((scrolled) => {
                 if(!scrolled && (window.scrollY > 500)) return true;
@@ -51,9 +55,9 @@ export default function Search(props) {
         <div>
             <div className="search">
                 <div>
-                    <button onClick={() => navigate("/cart")}>View My Cart ({props.cartcount || "0"})</button>
+                    <button onClick={() => navigate("/cart")} className={`shoppingcart ${(lastCartCount !== props.cartcount) ? 'rubberBand' : ''}`}>View My Cart ({props.cartcount || "0"})</button>
                     <input type="text" className="field" placeholder="Search for" onChange={(e) => setSearchTerm(e.target.value)} onKeyDown={keydownHandler} value={searchTerm}></input>
-                    <button className="gobutton" onClick={searchFor}></button>
+                    <button onClick={searchFor}>Search</button>
                 </div>
                 <div>
                     <button onClick={browseCategories}>Browse By Category</button>
