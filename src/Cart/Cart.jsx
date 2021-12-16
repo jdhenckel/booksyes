@@ -223,15 +223,15 @@ export default function Cart(props) {
             <div>Include MN tax: <input type='checkbox' checked={useMnTax} onChange={(e) => setUseMTax(e.target.checked)} /></div>
             <div><div>Total:</div><div>{toCurrency(order.subtotal + order.shippingcost + (useMnTax ? order.tax : 0))}</div></div>
         </div>}
-        {showorder && <div className="address">
-            <input value={address.recipient_name  || ''} name="recipient_name"   onChange={handleChange} type="name"    className={`full  ${shouldMarkError('recipient_name') ? "error" : ""}`}onBlur={handleBlur} placeholder="Name" />
-            <input value={address.phone || ''}           name="phone"            onChange={handleChange} type="tel"     className={`half  ${shouldMarkError('phone') ? "error" : ""}`}         onBlur={handleBlur} placeholder="Phone Number"/>
-            <input value={address.email || ''}           name="email"            onChange={handleChange} type="email"   className={`half  ${shouldMarkError('email') ? "error" : ""}`}         onBlur={handleBlur} placeholder="E-Mail Address" id='email'/>
-            <input value={address.line1 || ''}           name="line1"            onChange={handleChange} type="street"  className={`full  ${shouldMarkError('line1') ? "error" : ""}`}         onBlur={handleBlur} placeholder="Street" />
-            <input value={address.city || ''}            name="city"             onChange={handleChange} type="city"    className={`third ${shouldMarkError('city') ? "error" : ""}`}          onBlur={handleBlur} placeholder="City" />
-            <input value={address.state || ''}           name="state"            onChange={handleChange} type="state"   className={`third ${shouldMarkError('state') ? "error" : ""}`}         onBlur={handleBlur} placeholder="State" />
-            <input value={address.postal_code || ''}     name="postal_code"      onChange={handleChange} type="zip"     className={`third ${shouldMarkError('postal_code') ? "error" : ""}`}   onBlur={handleBlur} placeholder="Zip" />
-        </div>}
+        {showorder && <form className="address">
+            <input value={address.recipient_name  || ''} name="recipient_name"   onChange={handleChange} type="name"    className={`full  ${shouldMarkError('recipient_name') ? "error" : ""}`}onBlur={handleBlur} placeholder="Name" autocomplete="on" />
+            <input value={address.phone || ''}           name="phone"            onChange={handleChange} type="tel"     className={`half  ${shouldMarkError('phone') ? "error" : ""}`}         onBlur={handleBlur} placeholder="Phone Number" autocomplete="on" />
+            <input value={address.email || ''}           name="email"            onChange={handleChange} type="email"   className={`half  ${shouldMarkError('email') ? "error" : ""}`}         onBlur={handleBlur} placeholder="E-Mail Address" id='email' autocomplete="on" />
+            <input value={address.line1 || ''}           name="line1"            onChange={handleChange} type="street"  className={`full  ${shouldMarkError('line1') ? "error" : ""}`}         onBlur={handleBlur} placeholder="Street" autocomplete="on" />
+            <input value={address.city || ''}            name="city"             onChange={handleChange} type="city"    className={`third ${shouldMarkError('city') ? "error" : ""}`}          onBlur={handleBlur} placeholder="City" autocomplete="on" />
+            <input value={address.state || ''}           name="state"            onChange={handleChange} type="state"   className={`third ${shouldMarkError('state') ? "error" : ""}`}         onBlur={handleBlur} placeholder="State" autocomplete="on" />
+            <input value={address.postal_code || ''}     name="postal_code"      onChange={handleChange} type="zip"     className={`third ${shouldMarkError('postal_code') ? "error" : ""}`}   onBlur={handleBlur} placeholder="Zip" autocomplete="on" />
+        </form>}
         {showorder && <div className="message">
             <textarea value={address.message || ''}      name="message"          onChange={handleChange} placeholder="Message for Jan" />
         </div>}
