@@ -220,8 +220,8 @@ export default function Cart(props) {
             <div><div>Subtotal:</div><div>{toCurrency(order.subtotal)}</div></div>
             <div><div>Shipping:</div><div>{toCurrency(order.shippingcost)}</div></div>
             <div><div>MN Tax:</div><div>{toCurrency(order.tax)}</div></div>
-            <div><div>Total (non-MN):</div><div>{toCurrency(order.subtotal + order.shippingcost)}</div></div>
-            <div><div>Total (MN):</div><div>{toCurrency(order.subtotal + order.shippingcost + order.tax)}</div></div>
+            <div>Include MN tax: <input type='checkbox' checked={useMnTax} onChange={(e) => setUseMTax(e.target.checked)} /></div>
+            <div><div>Total:</div><div>{toCurrency(order.subtotal + order.shippingcost + (useMnTax ? order.tax : 0))}</div></div>
         </div>}
         {showorder && <div className="address">
             <input value={address.recipient_name  || ''} name="recipient_name"   onChange={handleChange} type="name"    className={`full  ${shouldMarkError('recipient_name') ? "error" : ""}`}onBlur={handleBlur} placeholder="Name" />
@@ -236,7 +236,8 @@ export default function Cart(props) {
             <textarea value={address.message || ''}      name="message"          onChange={handleChange} placeholder="Message for Jan" />
         </div>}
         {showorder && <div className="buttons">
-            <div>Include MN tax: <input type='checkbox' checked={useMnTax} onChange={(e) => setUseMTax(e.target.checked)} /></div>
+            <ReCAPTCHA onChange={recaptchaOnChange} sitekey={RECAPTCHA_KEY} />
+            <small>Use Paypal to pay with a credit card.</small>
             <PayPalButton   amount={paypalOrderAmount(useMnTax)} 
                             shippingPreference='NO_SHIPPING'
                             disabled={!isFormValid}
@@ -244,8 +245,8 @@ export default function Cart(props) {
                             onSuccess={(details, data) => orderwithpaypal(details, data)} 
                             style={{height: 25, layout: 'horizontal', color: 'blue', shape: 'rect', tagline: 'false'}} 
                             options={{clientId:order.clientId}} />
-            <button onClick={orderwithother}>Pay with other</button>
-            <ReCAPTCHA onChange={recaptchaOnChange} sitekey={RECAPTCHA_KEY} />
+            <button onClick={orderwithother}>Pay by check or money order</button>
+            
         </div>}    
     </div>
 }

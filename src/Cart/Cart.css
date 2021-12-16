@@ -25,6 +25,14 @@
     width: 100%;
 }
 
+.cart>div {
+    border-radius: 5px;
+}
+
+.confirm>div {
+    border-top: 1px black solid;
+}
+
 .cart, .confirm {
     display: flex;
     flex-direction: column;
@@ -83,7 +91,7 @@
     align-items: flex-end;
 }
 
-.buttons>div, .buttons>button {
+.buttons>div, .buttons>button, .buttons>small {
     width: 50%;
-    margin: 0;
+    margin: 5px;
 }
