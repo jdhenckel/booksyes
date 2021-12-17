@@ -116,7 +116,7 @@ function escapeAll(object) {
 }
 
 async function initOrdersSheet() {
-    const doc = new GoogleSpreadsheet(process.env.DATABASE_KEY);
+    const doc = new GoogleSpreadsheet(process.env.DATABASE_ORDERS_KEY);
 
     await doc.useServiceAccountAuth({
         client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,

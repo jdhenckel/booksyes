@@ -59,25 +59,29 @@ const buildSettings = exports.buildSettings = (data) => {
 
 const buildURL = exports.buildURL = (query, sheet) => {
     const {DATABASE_SHEET_BOOKS, DATABASE_SHEET_ORDERS, DATABASE_SHEET_CATEGORIES, DATABASE_SHEET_SETTINGS} = process.env;
-    const {DATABASE_LOCATION, DATABASE_KEY} = process.env;
+    const {DATABASE_LOCATION, DATABASE_KEY, DATABASE_ORDERS_KEY} = process.env;
 
     var id;
+    var key;
     switch(sheet) {
         case "books":
             id = DATABASE_SHEET_BOOKS;
+            key = "&key=" + DATABASE_KEY;
             break;
         case "categories":
             id = DATABASE_SHEET_CATEGORIES;
+            key = "&key=" + DATABASE_KEY;
             break;
         case "settings":
             id = DATABASE_SHEET_SETTINGS;
+            key = "&key=" + DATABASE_KEY;
             break;
         case "orders":
             id = DATABASE_SHEET_ORDERS;
+            key = "&key=" + DATABASE_ORDERS_KEY;
             break;
     }
 
-    const key = "&key=" + DATABASE_KEY;
     const gid = "&gid=" + id;
     const request = "&tq=" + query;
     const endpoint = DATABASE_LOCATION + "tq?" + request + key + gid;
