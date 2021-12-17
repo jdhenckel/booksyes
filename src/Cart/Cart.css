@@ -7,6 +7,10 @@
     justify-content: flex-start;
 }
 
+.hidden {
+    visibility: hidden;
+}
+
 .error { 
     border: 2px solid red;
     background-color: rgba(255, 0, 0, .2);

@@ -138,6 +138,7 @@ export default function Cart(props) {
             showPopupMessage('Please complete all required fields');
             return;
         }
+        setLoading(true);
     }
 
     const recaptchaOnChange = (value) => {
@@ -246,7 +247,7 @@ export default function Cart(props) {
         {showorder && <div className="message">
             <textarea value={address.message || ''}      name="message"          onChange={handleChange} placeholder="Message for Jan" />
         </div>}
-        {showorder && <div className="buttons">
+        {showorder && <div className={`buttons ${loading ? 'hidden' : ''}`}>
             <ReCAPTCHA onChange={recaptchaOnChange} sitekey={RECAPTCHA_KEY} />
             <small>Use Paypal to pay with a credit card.</small>
             <PayPalButton   amount={paypalOrderAmount(useMnTax)} 

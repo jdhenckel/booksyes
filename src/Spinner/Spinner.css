@@ -17,8 +17,7 @@
     position: relative;
     left: -9999px;
     width: 10px;
-    min-height: 5px;
-    max-height: 10px;
+    min-height: 10px;
     border-radius: 5px;
     background-color: var(--low-color);
     color: var(--low-color);
