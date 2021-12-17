@@ -23,7 +23,7 @@ export default function Main(props) {
             <hr />
             <small><a href="mailto:bigt40@aol.com">Email Jan</a> | <a href="mailto:jdhenckel@gmail.com">Email Webmaster</a></small>
             <hr />
-            <small>This way-cool web site developed by <a href="www.poorfox.com">poorfox</a>.</small>
+            <small>This way-cool web site developed by <a href="http://www.poorfox.com/">poorfox</a>.</small>
         </div>
     </div>
 }

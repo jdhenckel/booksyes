@@ -31,6 +31,7 @@ ${order.books.map((book) =>
 </pre></i></b>`
 }
 
+//Template for the email sent to the customer
 exports.orderConfirmationTemplate = (order, orderNumber) => {
     return `
     <br>Thank you for your order of ${order.books.length} ${order.books.length === 1 ? 'book' : 'books'}
@@ -44,6 +45,8 @@ exports.orderConfirmationTemplate = (order, orderNumber) => {
     <br>Order Number:   ${orderNumber}
     <br>TOTAL (taxed):   $ ${order.totalTaxed}
     <br>TOTAL (un-taxed):   $ ${order.totalUntaxed}
+    <br>
+    <br>If you chose to pay by check or money order remember to send payment to: Books of Yesterday 17105 Nowthen Blvd., Anoka, MN 55303
     <br>
     <br>If you need to make a change to this order please contact Jan at: 763-753-3429 or <a href="mailto:bigt40@aol.com">Email</a>
     <br>
