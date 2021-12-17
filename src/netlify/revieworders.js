@@ -15,7 +15,8 @@ exports.handler = async function(event, context) {
         });
 
         if(event.queryStringParameters.action == "view") {
-            return getOrders(event.queryStringParameters.showDeleted && true)
+            const ordersString = await getOrders(event.queryStringParameters.showDeleted && true);
+            return {statusCode: 200, body: ordersString};
         }
 
         if(event.queryStringParameters.action == "delete") {
@@ -66,20 +67,31 @@ async function deleteOrder(orderNumber) {
     }
 }
 
-function getOrders(showDeleted) {
-    var endpoint = '';
-    //load orders
-    if(showDeleted) {
-        endpoint = helpers.buildURL('select *', "orders");
-    } else {
-        endpoint = helpers.buildURL('select * where B is null', "orders");
+async function getOrders(showDeleted) {
+    const sheet = await initOrdersSheet();
+    var orders = [];
+
+    for (let i = 0; i < sheet.rowCount; i++) {
+        const order = JSON.parse(sheet.getCell(i, 0).value);
+        const isDeleted = sheet.getCell(i, 1).value === 'x';
+        const orderNumber = sheet.getCell(i, 2).value;
+
+        //must have an order and an order number
+        if(!order || !orderNumber) {
+            continue;
+        }
+
+        //don't put deleted rows in a regular search
+        if(!showDeleted && isDeleted) {
+            continue;
+        }
+
+        orders.push({
+            ...order,
+            isDeleted: isDeleted,
+            orderNumber: orderNumber,
+        });
     }
     
-
-    return axios.get(endpoint, {headers: {'X-DataSource-Auth':""}})
-    .then(response => ({
-        statusCode: 200,
-        body: helpers.buildOrders(response.data),
-    }))
-    .catch((error) => ({ statusCode: 422, body: String(error) }));
+    return JSON.stringify(orders);
 }

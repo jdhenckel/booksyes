@@ -25,24 +25,6 @@ exports.buildBooks = (data) => {
     return JSON.stringify(retObj);
 };
 
-exports.buildOrders = (data) => {
-    const table = JSON.parse(data.replace(/^\)]\}'\n/, '')).table;
-    const ordersArr = [];
-
-    for (let r = 0; r < table.rows.length; r++) {
-        const row = table.rows[r];
-        var orderObj = {
-            orderNumber: row.c[2].v,
-            isDeleted: (row.c[1] !== null),
-            ...JSON.parse(row.c[0].v), 
-        }
-
-        ordersArr.push(orderObj);
-    }
-
-    return JSON.stringify(ordersArr);
-}
-
 const buildSettings = exports.buildSettings = (data) => {
     const table = JSON.parse(data.replace(/^\)]\}'\n/, '')).table;
     const settingObj = {};
@@ -58,30 +40,24 @@ const buildSettings = exports.buildSettings = (data) => {
 }
 
 const buildURL = exports.buildURL = (query, sheet) => {
-    const {DATABASE_SHEET_BOOKS, DATABASE_SHEET_ORDERS, DATABASE_SHEET_CATEGORIES, DATABASE_SHEET_SETTINGS} = process.env;
-    const {DATABASE_LOCATION, DATABASE_KEY, DATABASE_ORDERS_KEY} = process.env;
+    const {DATABASE_SHEET_BOOKS, DATABASE_SHEET_CATEGORIES, DATABASE_SHEET_SETTINGS} = process.env;
+    const {DATABASE_LOCATION, DATABASE_KEY} = process.env;
 
     var id;
-    var key;
     switch(sheet) {
         case "books":
             id = DATABASE_SHEET_BOOKS;
-            key = "&key=" + DATABASE_KEY;
             break;
         case "categories":
             id = DATABASE_SHEET_CATEGORIES;
-            key = "&key=" + DATABASE_KEY;
             break;
         case "settings":
             id = DATABASE_SHEET_SETTINGS;
-            key = "&key=" + DATABASE_KEY;
-            break;
-        case "orders":
-            id = DATABASE_SHEET_ORDERS;
-            key = "&key=" + DATABASE_ORDERS_KEY;
+            
             break;
     }
 
+    const key = "&key=" + DATABASE_KEY;
     const gid = "&gid=" + id;
     const request = "&tq=" + query;
     const endpoint = DATABASE_LOCATION + "tq?" + request + key + gid;

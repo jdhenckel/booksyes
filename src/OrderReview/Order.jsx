@@ -41,12 +41,13 @@ export default function Order(props) {
                     Subtotal: {order.subtotal}<br />
                     Tax: {order.tax}<br />
                     Shiping cost: {order.shippingcost}<br />
-                    Total: {order.total}<br />
+                    Total (Taxed): {order.totalTaxed}<br />
+                    Total (untaxed): {order.totalUntaxed}<br />
                     payment Type: {order.paymentType}<br />
                 </div>
                 <div>
                     <div>Message from the Buyer:</div>
-                    {order.message}
+                    {order.shippingAddress.message}
                 </div>
             </div>
             <div className='booklist'>
