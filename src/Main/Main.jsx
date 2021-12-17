@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import logo from './booksyes.jpg';
 import Search from '../Search/Search';
 import { Outlet } from 'react-router-dom';
-import Spinner from '../Spinner/Spinner';
 
 
 export default function Main(props) {
