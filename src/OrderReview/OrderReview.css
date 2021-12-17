@@ -2,11 +2,11 @@
     display: flex;
 }
 
-.OrderReview>div {
+.OrderReview>div:not(.popup-box) {
     margin: 1em;
 }
 
-.OrderReview>div>* {
+.OrderReview>div:not(.popup-box)>* {
     margin: 5px;
 }
 
