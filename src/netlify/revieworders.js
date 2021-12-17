@@ -89,7 +89,6 @@ async function getOrders(showDeleted) {
         orders.push({
             ...order,
             isDeleted: isDeleted,
-            orderNumber: orderNumber,
         });
     }
     

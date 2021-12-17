@@ -9,10 +9,16 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 
 exports.handler = async function(event, context) {
     try {
-        const order = JSON.parse(event.body).body.order;
-        var exscapedOrder = order;
+        const orderTimeStamp = (new Date()).toDateString();
+        const orderNumber = helpers.getOrderNumber(); 
+        const order = {
+            ...JSON.parse(event.body).body.order,
+            orderNumber: orderNumber,
+            dateString: orderTimeStamp,
+        };
+        var escapedOrder = order;
         console.log(order);
-        escapeAll(exscapedOrder);
+        escapeAll(escapedOrder);
 
         const settings = await helpers.getSettings();
 
@@ -37,13 +43,10 @@ exports.handler = async function(event, context) {
             throw 'Missing some required contact or shipping information.  please correct it and try again.';
         }
 
-        //get ordernumber
-        const orderNumber = helpers.getOrderNumber();
-
         try {
             //write order to database
             const ordersSheet = await initOrdersSheet();
-            await writeOrderToSheet(order, orderNumber, ordersSheet);
+            await writeOrderToSheet(order, ordersSheet);
         } catch (error) {
             throw 'There was an problem completing your order. You can try resubmitting it, or contact Jan directly using the link at the bottom of the page';
         }
@@ -53,7 +56,7 @@ exports.handler = async function(event, context) {
             content: {
                 from: 'no-reply@orders.booksofyesterday.com',
                 subject: 'New Books Of Yesterday Order',
-                html: templates.orderNotificationTemplate(exscapedOrder, orderNumber),
+                html: templates.orderNotificationTemplate(escapedOrder, orderNumber),
             },
             recipients: settings.orderemails.split(',').map((email) => ({address: email})),
         }).then(handleSuccess).catch(handleEmailErrors);
@@ -63,7 +66,7 @@ exports.handler = async function(event, context) {
             content: {
                 from: 'no-reply@orders.booksofyesterday.com',
                 subject: 'Books Of Yesterday Order Confirmation',
-                html: templates.orderConfirmationTemplate(exscapedOrder, orderNumber),
+                html: templates.orderConfirmationTemplate(escapedOrder, orderNumber),
             },
             recipients: [
                 {address: order.shippingAddress.email,
@@ -129,7 +132,7 @@ async function initOrdersSheet() {
     return sheet;
 }
 
-async function writeOrderToSheet(order, orderNumber, sheet) {
+async function writeOrderToSheet(order, sheet) {
     //resize is 1-indexed
     await sheet.resize({ rowCount: sheet.rowCount + 1, columnCount: sheet.columnCount});
     
@@ -138,7 +141,7 @@ async function writeOrderToSheet(order, orderNumber, sheet) {
     
     //getcell is 0-indexed
     sheet.getCell(sheet.rowCount - 1, 0).value = JSON.stringify(order);
-    sheet.getCell(sheet.rowCount - 1, 2).value = orderNumber;
+    sheet.getCell(sheet.rowCount - 1, 2).value = order.orderNumber;
 
     await sheet.saveUpdatedCells();
     return;

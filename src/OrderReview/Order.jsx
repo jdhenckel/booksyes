@@ -21,6 +21,9 @@ export default function Order(props) {
                 {order.orderNumber}
             </div>
             <div>
+                {order.dateString}
+            </div>
+            <div>
                 {order.books.length} {order.books.length === 1 ? ' book': ' books'} <br />
                 {waiting? 
                 <Spinner loading={true} /> :
