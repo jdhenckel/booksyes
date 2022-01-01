@@ -6,6 +6,12 @@
     row-gap: 1em;
     padding-bottom: 10px;
     background-color: var(--base-color);
+    color: var(--base-text-color);
+    text-align: center;
+    font: 1em arial;
+    border: 5px ridge #e8c675;
+    margin: 0 1em 1em;    
+    
 }
 
 .search .field {
@@ -23,7 +29,8 @@
 }
 
 .search .infotext {
-    width: 50%;
+    width: 90%;
+    padding: 0 3em;
 }
 
 .search button {
