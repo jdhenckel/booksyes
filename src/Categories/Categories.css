@@ -8,7 +8,6 @@
 .categories>button {
     flex-grow: 1;
     text-size-adjust: 3px;
-    font-size: inherit;
     cursor: pointer;
     transition: all .2s ease-in-out;
     text-align: left;

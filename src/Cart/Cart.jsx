@@ -225,9 +225,11 @@ export default function Cart(props) {
             {books.map((book, index) => (
                 <div key={index} className={index % 2 === 0 ? "even" : "odd"}>
                     <button onClick={() => changeCart(true, book)}>Remove from Cart</button>
-                    <div>{book.author}</div>
-                    <div>{book.title}</div>
-                    <div>{toCurrency(book.price)}</div>
+                    <div>
+                        <span className="author">{book.author} </span>
+                        <span className="title">{book.title} </span> 
+                    </div>
+                    <div><span className="price">{toCurrency(book.price)}</span></div>
                 </div>
             ))}
             
