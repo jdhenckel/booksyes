@@ -1,15 +1,15 @@
 //called with /.netlify/functions/hasphoto
-const axios = require('axios');
 const helpers = require('./helperFuncs.js');
 
 exports.handler = async function(event, context) {
 
-    const endpoint = helpers.buildURL('select * where ' + helpers.imageCol + ' is not null', "books");
+    hasImage = (row) => {
+        return row.imageSrc !== '';
+    }
 
-    return axios.get(endpoint, {headers: {'X-DataSource-Auth':""}})
+    return helpers.getBooks(hasImage, event.queryStringParameters.query)
     .then(response => ({
-        statusCode: 200,
-        body: helpers.buildBooks(response.data),
+        statusCode: 200, body: JSON.stringify(response)
     }))
     .catch((error) => ({ statusCode: 422, body: String(error) }));
 }

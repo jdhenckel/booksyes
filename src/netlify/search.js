@@ -1,32 +1,23 @@
 //called with /.netlify/functions/search
-const axios = require('axios');
 const helpers = require('./helperFuncs.js');
 
 exports.handler = async function(event, context) {
 
-    buildQuery = (searchTerms) => {
+    searchFunction = (row, searchTerms) => {
         const terms = searchTerms.split(" ");
-        var queryString = "select * ";
-        if(searchTerms == "") return queryString;
-        queryString += 'where ';
-
-        for (let i = 0; i < terms.length; i++) {
-            if(i != 0 && i < terms.length) { //not the first or last
-                queryString += "and ";
-            }
-            const term = terms[i].toLowerCase();
-            queryString += helpers.searchCol + ' contains "' + term + '" ';
+        if(terms.length === 0) return true;
+        for (let t = 0; t < terms.length; t++) {
+            const term = terms[t].toLowerCase();
+            return row.title.toLowerCase().includes(term) ||
+                row.author.toLowerCase().includes(term) ||
+                row.description.toLowerCase().includes(term) ||
+                row.ISBN.toLowerCase().includes(term);
         }
+    }
 
-        return queryString;
-    };
-
-    const endpoint = helpers.buildURL(buildQuery(event.queryStringParameters.query ? event.queryStringParameters.query : ""), "books");
-
-    return axios.get(endpoint, {headers: {'X-DataSource-Auth':""}})
+    return helpers.getBooks(searchFunction, event.queryStringParameters.query ? event.queryStringParameters.query : "")
     .then(response => ({
-        statusCode: 200,
-        body: helpers.buildBooks(response.data),
+        statusCode: 200, body: JSON.stringify(response)
     }))
     .catch((error) => ({ statusCode: 422, body: String(error) }));
 }

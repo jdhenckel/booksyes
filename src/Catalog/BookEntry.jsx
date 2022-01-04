@@ -22,6 +22,10 @@ function BookEntry(props) {
         setImages(imageNames);
     }
 
+    const toCurrency = (num) => {
+        return '$' + Number.parseFloat(num).toFixed(2)
+    }
+
     const imageError = (e) => {
         e.target.style.display = 'none';
     }
@@ -34,7 +38,7 @@ function BookEntry(props) {
                 <span className="author">{props.book.author} </span>
                 <span className="title">{props.book.title} </span>
                 {props.book.description} 
-                <span className="price"> ${props.book.price} </span>
+                <span className="price"> {toCurrency(props.book.price)} </span>
             </div>
             {(images && images.length !== 0) && <div>
                 <div className="caption">photo of the actual item</div>

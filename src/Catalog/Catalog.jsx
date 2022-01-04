@@ -50,7 +50,7 @@ export default function Catalog(props) {
     }
 
     const inCart = (book) => {
-        return cart.some(e => e.search === book.search);
+        return cart.some(e => e.id === book.id);
     }
 
     return(

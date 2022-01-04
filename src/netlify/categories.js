@@ -4,22 +4,22 @@ const helpers = require('./helperFuncs.js');
 
 exports.handler = async function(event, context) {
 
-    const endpoint = helpers.buildURL('select *', "categories");
-
-    makeCategoryList = (data) => {
-        const table = JSON.parse(data.replace(/^\)]\}'\n/, '')).table;
+    const getCategories = async function() {
+        const sheet = await helpers.initCatalogSheet(process.env.DATABASE_SHEET_CATEGORIES);
+        await sheet.loadCells();
         var retobj = {categories: []};
-        for (let i = 0; i < table.rows.length; i++) {
-            const element = table.rows[i].c[0].v;
+        for (let i = 0; i < sheet.rowCount; i++) {
+            const element = sheet.getCell(i, 0).value;
             retobj.categories.push(element);
         }
-        return JSON.stringify(retobj);
+
+        return retobj;
     }
 
-    return axios.get(endpoint, {headers: {'X-DataSource-Auth':""}})
+    return getCategories()
     .then(response => ({
         statusCode: 200,
-        body: makeCategoryList(response.data),
+        body: JSON.stringify(response),
     }))
     .catch((error) => ({ statusCode: 422, body: String(error) }));
 }
