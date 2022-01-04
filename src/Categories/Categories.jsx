@@ -11,6 +11,7 @@ export default function Categories(props) {
 
     useEffect(() => {
         setLoading(true);
+
         axios.get('/.netlify/functions/categories')
         .then(response => {
             const categories = response.data.categories;

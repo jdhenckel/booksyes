@@ -48,6 +48,16 @@
     justify-content: space-between;
 }
 
+.cart>div:first-child {
+    justify-content: center;
+}
+
+.cart>div>button {
+    width: 12em;
+    white-space: nowrap;
+    flex: none;
+}
+
 .address {
     display: flex;    
     width: 50%;

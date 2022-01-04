@@ -1,5 +1,7 @@
 .catalog {
     font-family: arial, helv;
+    overflow-y: scroll; /* allow momentum scrolling on phones */
+    -webkit-overflow-scrolling: touch;
 }
 
 .bookContainer {

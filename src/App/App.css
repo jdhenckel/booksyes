@@ -4,22 +4,92 @@
  * ==============================================
  */
 :root {
-  --base-color: #FBE8A6;
-  --secondary-color: #F4976C;
-  --low-color: #303C6C;
-  --high-color: #B4DFE5;
-  --high-color-disabled: hsl(186, 11%, 36%);
-  --accent-color: #D2FDFF;
+  --base-color: #947149;
+  --secondary-color: #fad4b059;
+  --bg-edge-color: #ece2d1;
+  --corner-color: #e8c675;
+  --base-text-color: #e8c675;
+  --low-color: #daa352;
+  --high-color: #e8c675;
+  --high-color-disabled: #868585;
+  --accent-color: #eeeeee00;
 }
 
 body {
   margin: 0;
+  background-color: var(--bg-edge-color);
+  font-size: max(10px,min(17px,1.5vw));   /* auto-size for mobile/desktop, within limits */
+}
+
+button, input, textarea {
+  font-size: inherit;   /* why is this not the default? browsers are stupid */
+}
+
+button {
+  border: 3px outset #e1b857;
+  border-radius: 4px;
+}
+
+button:active {
+  border-style: inset;
+}
+
+h3 { 
+  font-weight: normal;
+}
+
+hr {
+  border-top: 1px solid #cfa532;
+  border-bottom: 1px solid #e8c675;
+}
+
+#root {
+  background-image: linear-gradient(to right, var(--bg-edge-color), white, var(--bg-edge-color));
+  margin: 5px;
 }
 
 .App {
-  text-align: center;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: var(--accent-color);
+  /* text-align: center; */
+  border: 7px double var(--corner-color);
+  font-family: 'Georgia',serif;
+}
+
+.App > div:first-child {
+  text-align: center; /* Center the LOGO IMAGE and TEXT */
+  padding-top: 1rem;
+}
+
+.bg {
+  background-position: 50% 50%;
+  background-size: cover;
+  box-sizing: border-box;
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  
+}
+
+.topleft {  
+  left: 0;
+  top: 0;
+}
+
+.topright {
+  right: 0;
+  top: 0;
+  transform: rotate(90deg);
+}
+
+.bottomleft {  
+  left: 0;
+  bottom: 0;
+  transform: rotate(270deg);
+}
+
+.bottomright {
+  right: 0;
+  bottom: 0;
+  transform: rotate(180deg);
 }
 
 .loader {
@@ -68,8 +138,10 @@ button.linklike {
 
 .footer {
   width: 100%;
-  padding-bottom: 30px;
+  padding-bottom: 1rem;
   background-color: var(--base-color);
+  color: var(--base-text-color);
+  text-align: center;
   z-index: 100;
 }
 
@@ -81,8 +153,6 @@ button.linklike {
 
 button {
   background: var(--high-color);
-  border: none;
-  border-radius: 4px;
   -webkit-box-shadow: 0 3px 13px -2px rgba(0, 0, 0, .15);
   box-shadow: 0 3px 13px -2px rgba(0, 0, 0, .15);
   color: #000;

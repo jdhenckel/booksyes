@@ -64,8 +64,7 @@ export default function Search(props) {
                     <button onClick={searchRecent}>Find Recent Additions</button>
                     <button onClick={searchPhoto}>Find Books with a Photo</button>
                 </div>
-                {!scrolled && <small className="infotext">To search the catalog for a word or phrase, type it in the Search field and click on the GO! button.
-To view the entire catalog, leave the Search field blank. To load the entire catalog takes about five minutes if you are using a slow connection.
+                {!scrolled && <small className="infotext">
 To browse the catalog one section at a time, click the Browse by category button.</small>}
             </div>
         </div>

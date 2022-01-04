@@ -33,8 +33,10 @@ export default function Catalog(props) {
                 return;
         }
         setLoading(true);
+        
         axios.get(url)
         .then(res => {
+            console.log('RESPONSE = ',res);
             handleResponse(res);
         }).finally(() => {
             setLoading(false);

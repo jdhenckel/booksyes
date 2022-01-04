@@ -41,7 +41,6 @@ function BookEntry(props) {
                 <span className="price"> {toCurrency(props.book.price)} </span>
             </div>
             {(images && images.length !== 0) && <div>
-                <div className="caption">photo of the actual item</div>
                 {images.map((image, index) => (
                     <img key={index} className="bookImage" onError={imageError} src={image} border="0" alt="actual book cover"/>
                 ))}
