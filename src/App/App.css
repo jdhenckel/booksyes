@@ -52,6 +52,10 @@ hr {
   /* text-align: center; */
   border: 7px double var(--corner-color);
   font-family: 'Georgia',serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: calc(100vh - 24px);
 }
 
 .App > div:first-child {

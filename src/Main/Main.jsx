@@ -21,7 +21,7 @@ export default function Main(props) {
             <Search cartcount={props.cartcount} />
         </div>
         <Outlet />
-        <div className="footer sticky bottom">
+        <div className="footer sticky">
             <hr />
             <small><a href="mailto:bigt40@aol.com">Email Jan</a> | <a href="mailto:jdhenckel@gmail.com">Email Webmaster</a></small>
             <hr />
