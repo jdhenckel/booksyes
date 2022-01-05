@@ -55,7 +55,7 @@ exports.handler = async function(event, context) {
         await client.transmissions.send({
             content: {
                 from: 'no-reply@orders.booksofyesterday.com',
-                subject: 'New Books Of Yesterday Order',
+                subject: `New Books Of Yesterday Order ${orderNumber}`,
                 html: templates.orderNotificationTemplate(escapedOrder, orderNumber),
             },
             recipients: settings.orderemails.split(',').map((email) => ({address: email})),
@@ -65,7 +65,7 @@ exports.handler = async function(event, context) {
         await client.transmissions.send({
             content: {
                 from: 'no-reply@orders.booksofyesterday.com',
-                subject: 'Books Of Yesterday Order Confirmation',
+                subject: `Books Of Yesterday Order Confirmation ${orderNumber}`,
                 html: templates.orderConfirmationTemplate(escapedOrder, orderNumber),
             },
             recipients: [
