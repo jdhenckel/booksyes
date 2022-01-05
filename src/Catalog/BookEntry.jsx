@@ -32,7 +32,11 @@ function BookEntry(props) {
 
     return (
         <div className="bookentry">
-            <div><img className="bookImage" onError={imageError} src={'https://covers.openlibrary.org/b/isbn/' + props.book.ISBN + '-L.jpg?default=false'} alt="example Book cover"/></div>
+            <div>
+                <a href={'https://covers.openlibrary.org/b/isbn/' + props.book.ISBN + '-L.jpg?default=false'} target="_blank" rel="noopener noreferrer">
+                    <img className="bookImage" onError={imageError} src={'https://covers.openlibrary.org/b/isbn/' + props.book.ISBN + '-L.jpg?default=false'} alt=""/>
+                </a>
+            </div>
             <div className="main">
                 {props.book.isNew === "true" && <img id="newImage" src={newImage} alt="new!"/>}
                 <span className="author">{props.book.author} </span>
@@ -42,7 +46,7 @@ function BookEntry(props) {
             </div>
             {(images && images.length !== 0) && <div>
                 {images.map((image, index) => (
-                    <img key={index} className="bookImage" onError={imageError} src={image} border="0" alt="actual book cover"/>
+                    <a href={image} target="_blank" rel="noopener noreferrer"><img key={index} className="bookImage" onError={imageError} src={image} border="0" alt=""/></a>
                 ))}
             </div>}
         </div>
