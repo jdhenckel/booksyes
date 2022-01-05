@@ -34,7 +34,10 @@ export default function App(props) {
     <Routes>
       <Route path="/" element={<Main cartcount={cartSize} />} >
         <Route path="/success" element={<Success />} />
-        <Route exact path="/catalog/:type/:query" element={<Catalog cart={cart} changeCart={updateCart} />} />
+        <Route exact path="/catalog/:type" > {/* This is the recommended way to handle optional perams per https://github.com/remix-run/react-router/issues/7285 */}
+          <Route path="" element={<Catalog cart={cart} changeCart={updateCart}/>} />
+          <Route path=":query" element={<Catalog cart={cart} changeCart={updateCart}/>} />
+        </Route>
         <Route path="/categories" element={<Categories />} />
         <Route path="/cart" element={<Cart cart={cart} changeCart={updateCart} />} />
         <Route path="/revieworders" element={<OrderReview />} />
