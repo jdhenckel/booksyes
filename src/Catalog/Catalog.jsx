@@ -9,7 +9,7 @@ import "./Catalog.css";
 export default function Catalog(props) {
     const [loading, setLoading] = useState(false);
     const [books, setBooks] = useState([]);
-    const cart = useState(props.cart ?? []);
+    const [cart] = useState(props.cart ?? []);
 
     const {type, query} = useParams();
 
