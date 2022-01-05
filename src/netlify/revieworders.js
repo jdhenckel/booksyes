@@ -10,7 +10,7 @@ exports.handler = async function(event, context) {
         //check if password matches
         await bcrypt.compare(password, process.env.ORDER_REVIEW_HASH).then(function(result) {
             if(result !== true) {
-                throw 'Invalid Password';
+                throw 'Incorrect Password';
             }
         });
 

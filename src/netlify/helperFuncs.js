@@ -13,10 +13,26 @@ exports.getSettings = async function() {
     return settingsObj;
 }
 
-exports.getOrderNumber = () => {
+exports.getOrderNumber = async () => {
+    const sheet = await initCatalogSheet(process.env.DATABASE_SHEET_SETTINGS);
+    await sheet.loadCells();
+    return checkOrderNumber(makeOrderNumber(), sheet);
+}
+
+const makeOrderNumber = () => {
     const year = (new Date()).getFullYear().toString().slice(-2);
     const digits = (new Date()).getTime().toString().slice(-6);
-    return year + digits;
+    const rand = Math.floor(Math.random() * 10);
+    return year + digits + rand;
+}
+
+const checkOrderNumber = (number, sheet) => {
+    for (let i = 0; i < sheet.rowCount; i++) {
+        const ordernumber = sheet.getCell(i, 2).value;
+        if(number === ordernumber) return checkOrderNumber(makeOrderNumber(), sheet);
+    }
+
+    return number;
 }
 
 const initCatalogSheet = exports.initCatalogSheet = async function (sheetId = process.env.DATABASE_SHEET_BOOKS) {

@@ -10,7 +10,7 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 exports.handler = async function(event, context) {
     try {
         const orderTimeStamp = (new Date()).toDateString();
-        const orderNumber = helpers.getOrderNumber(); 
+        const orderNumber = await helpers.getOrderNumber();
         const order = {
             ...JSON.parse(event.body).body.order,
             orderNumber: orderNumber,
