@@ -216,8 +216,7 @@ export default function Cart(props) {
         
         <div className="cart">
             {!cartIsEmpty() && <div>
-                 <button onClick={getOrder}>{showorder ? "Update Cart" : "Check out"}</button>
-                 <Spinner loading={loading} />
+                <Spinner loading={loading} ><button onClick={getOrder}>{showorder ? "Update Cart" : "Check out"}</button></Spinner>
             </div>}
             {books.map((book, index) => (
                 <div key={index} className={index % 2 === 0 ? "even" : "odd"}>
