@@ -4,6 +4,7 @@ import OrderReview from '../OrderReview/OrderReview';
 import Categories from '../Categories/Categories';
 import Cart from '../Cart/Cart';
 import Success from '../Cart/Success';
+import AboutUs from './AboutUs';
 import './App.css';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Main from '../Main/Main';
@@ -41,6 +42,7 @@ export default function App(props) {
         <Route path="/categories" element={<Categories />} />
         <Route path="/cart" element={<Cart cart={cart} changeCart={updateCart} />} />
         <Route path="/revieworders" element={<OrderReview />} />
+        <Route path="/" element={<AboutUs />} />
       </Route>
     </Routes>
   </BrowserRouter>
