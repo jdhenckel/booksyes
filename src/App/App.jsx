@@ -40,6 +40,7 @@ export default function App(props) {
           <Route path=":query" element={<Catalog cart={cart} changeCart={updateCart}/>} />
         </Route>
         <Route path="/categories" element={<Categories />} />
+        <Route path="/newcatalog" element={<NewCatalog />} />
         <Route path="/cart" element={<Cart cart={cart} changeCart={updateCart} />} />
         <Route path="/revieworders" element={<OrderReview />} />
         <Route path="/" element={<AboutUs />} />
