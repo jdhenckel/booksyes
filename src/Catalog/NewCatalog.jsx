@@ -4,7 +4,7 @@ import './NewCatalog.css';
 export default function NewCatalog(props) {
 
     return (
-<div>
+<div class="newcatalog">
 <h2>Update Catalog</h2>
 Use this page to <u>completely replace</u>
 the online catalog.

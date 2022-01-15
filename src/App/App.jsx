@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Catalog from '../Catalog/Catalog';
+import NewCatalog from '../Catalog/NewCatalog';
 import OrderReview from '../OrderReview/OrderReview';
 import Categories from '../Categories/Categories';
 import Cart from '../Cart/Cart';
