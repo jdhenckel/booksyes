@@ -48,15 +48,15 @@ function parseValueList(values) {
 exports.handler = async function(event, context) {
     try {
         let ctype = event.headers['content-type'];
-        ctdata = parseValueList(ctype);
-        if (!ctdata['multipart/form-data'])
+        let cdata = parseValueList(ctype);
+        if (!cdata['multipart/form-data'])
             throw new Error('content-type not correct: '+ctype);
         let body = Buffer.from(event.body,'base64').toString('utf8');
-        let chunks = body.split('--' + ctdata.boundary);
-        crag = {};
+        let chunks = body.split('--' + cdata.boundary);
+        let crag = {};
         for (let c of chunks) {
-            clist = c.split('\r\n');
-            cdata = parseValueList(clist[0]);
+            let clist = c.split('\r\n');
+            let cdata = parseValueList(clist[0]);
             crag[cdata.name] = clist[clist.indexOf('') + 1];
         }
 
@@ -66,7 +66,6 @@ exports.handler = async function(event, context) {
                 echo_body: body,
                 crag: crag,
                 method: event.httpMethod,
-                headers: event.headers,
                 query: event.queryStringParameters,
                 path: event.path
             },null,4),

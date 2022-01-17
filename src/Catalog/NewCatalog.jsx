@@ -9,7 +9,7 @@ export default function NewCatalog(props) {
 Use this page to <u>completely replace</u>
 the online catalog.
 <hr/>
-<form method="post" action="/.netlify/functions/getstatus" enctype="multipart/form-data">
+<form method="post" action="/.netlify/functions/updatecatalog" enctype="multipart/form-data">
 
 <br/>Password: &nbsp; <input name="password" size="25"/>
 <br/>Filename: &nbsp; <input name="filename" type="file"/>
