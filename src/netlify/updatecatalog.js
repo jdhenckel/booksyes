@@ -38,10 +38,13 @@ function parseValueList(values) {
     alist = values.split(';');
     for (a of alist) {
         i = a.search(/[:=]/);
-        if (i == -1) result[a] = true;
-        else if (a.substring(i,1)=='"') 
-            result[a.substring(0,i).trim()] = a.substring(i+2,a.length-1);
-        else result[a.substring(0,i).trim()] = a.substring(i+1).trim();
+        k = a.substring(0,i).trim();
+        if (k==='') 
+            result[a] = true;
+        else if (a.charAt(i+1)=='"') 
+            result[k] = a.substring(i+2,a.length-1);
+        else 
+            result[k] = a.substring(i+1).trim();
     }
     return result;    
 }
