@@ -30,8 +30,8 @@ Update catalog
 */
 
 
-// Given input: "foobar: test1; foobaz=xyz,abc; zoop" this will return an object
-// { foobar: 'test1', foobaz: 'xyz,abc', zoop: true }
+// Given input: "foobar: test1; foobaz="xyz"; zoop" this will 
+// Return { foobar: 'test1', foobaz: 'xyz', zoop: true }
 function parseValueList(values) {
     result = {};
     if (values==null) return result;
@@ -39,6 +39,8 @@ function parseValueList(values) {
     for (a of alist) {
         i = a.search(/[:=]/);
         if (i == -1) result[a] = true;
+        else if (a.substring(i,1)=='"') 
+            result[a.substring(0,i).trim()] = a.substring(i+2,a.length-1);
         else result[a.substring(0,i).trim()] = a.substring(i+1).trim();
     }
     return result;    
@@ -55,9 +57,9 @@ exports.handler = async function(event, context) {
         let chunks = body.split('--' + cdata.boundary);
         let crag = {};
         for (let c of chunks) {
-            let clist = c.split('\r\n');
-            let cdata = parseValueList(clist[0]);
-            crag[cdata.name] = clist[clist.indexOf('') + 1];
+            let lines = c.split('\r\n');
+            let first = parseValueList(lines[1]);
+            crag[first.name] = lines.slice(lines.indexOf('',1) + 1);
         }
 
         return {
@@ -70,6 +72,7 @@ exports.handler = async function(event, context) {
                 path: event.path
             },null,4),
         };
+
     } catch(error) {
         return {
             statusCode: 400,
