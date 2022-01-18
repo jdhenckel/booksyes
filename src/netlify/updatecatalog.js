@@ -134,7 +134,7 @@ exports.handler = async function(event, context) {
         let body = Buffer.from(event.body,'base64').toString('utf8');
         let params = parseMultiPart(body, cdata.boundary);
         if (params.password !== 'xx') { // process.env.UPDATE_CATALOG_PASSWORD) {
-            return JSON.stringify({ statusCode: 200, body: 'wrong password'});
+            throw Error('wrong password, params=' + JSON.stringify(params));
         }
 
         let newdata = parseCatalog(params.filename);
@@ -146,14 +146,21 @@ exports.handler = async function(event, context) {
                 newdata: newdata,
                 method: event.httpMethod,
                 query: event.queryStringParameters,
-                path: event.path
+                path: event.path,
             },null,4),
         };
 
     } catch(error) {
         return {
             statusCode: 400,
-            body: JSON.stringify(error.stack)
-        }
+            body: JSON.stringify({
+                columnNumber: error.columnNumber,
+                fileName: error.fileName,
+                lineNumber: error.lineNumber,
+                message: error.message,
+                name: error.name,
+                stack: error.stack,
+            },null,4),
+        };
     }
 }
