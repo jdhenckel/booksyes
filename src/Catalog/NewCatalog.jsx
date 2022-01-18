@@ -12,20 +12,23 @@ the online catalog.
 <form method="post" action="/.netlify/functions/updatecatalog" enctype="multipart/form-data">
 
 <br/>Password: &nbsp; <input name="password" size="25"/>
-<br/>Filename: &nbsp; <input name="filename" type="file"/>
+<br/>Filename: &nbsp; <input name="bookdata" type="file"/>
 <br/>
 <br/>
 <input type="submit" name="doit" value="Update catalog"/>
 </form>
 <br/>
-Here are some rules to follow to ensure that the book list will
-show up correctly in the catalog.
-
+Here is an example of a book entry:
+<br/>
+<tt>Twain, Mark.  THE GUILDED AGE: A Tale of Today.  Fun to read. Mint.  $15. </tt>
+<br/>
 <ul>
-<li>Every book must have a price, a dollar sign followed by a number.</li>
-<li>Every heading must have a blank line after it.</li>
-<li>MAJOR headings must be all UPPERCASE.</li>
-<li>Group headings can be mixed case.</li>
+<li>Use period-space-space between the parts of the entries.</li>
+<li>The order must be: Author, TITLE, Description, Price.  Only TITLE and Price are required.</li>
+<li>The description can contain ISBN number. To add pictures put <tt>p=i,DSC_0123,DSC_0124</tt> into 
+the description.  The "i" is for pictures at "hosting.photobucket", otherwise "i1103.photobucket".</li>
+<li>CATEGORY headings must be all UPPERCASE.</li>
+<li>Group headings must be mixed case.</li>
 <li>Books that belong to a small group must be indented 4 spaces.</li>
 <li>Don't put more than one book on a line.</li>
 </ul>

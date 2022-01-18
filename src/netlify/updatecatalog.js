@@ -133,11 +133,11 @@ exports.handler = async function(event, context) {
             throw new Error('content-type not correct: '+ctype);
         let body = Buffer.from(event.body,'base64').toString('utf8');
         let params = parseMultiPart(body, cdata.boundary);
-        if (params.password !== 'xx') { // process.env.UPDATE_CATALOG_PASSWORD) {
-            throw Error('wrong password, params=' + JSON.stringify(params));
+        if (params.password[0] !== 'xx') { // process.env.UPDATE_CATALOG_PASSWORD) {
+            throw Error('wrong password' + JSON.stringify(params).substring(0,200));
         }
 
-        let newdata = parseCatalog(params.filename);
+        let newdata = parseCatalog(params.bookdata);
 
         return {
             statusCode: 200,
@@ -147,20 +147,17 @@ exports.handler = async function(event, context) {
                 method: event.httpMethod,
                 query: event.queryStringParameters,
                 path: event.path,
-            },null,4),
+            }),
         };
 
     } catch(error) {
         return {
             statusCode: 400,
             body: JSON.stringify({
-                columnNumber: error.columnNumber,
-                fileName: error.fileName,
-                lineNumber: error.lineNumber,
                 message: error.message,
                 name: error.name,
                 stack: error.stack,
-            },null,4),
+            }),
         };
     }
 }
