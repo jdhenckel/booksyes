@@ -153,7 +153,7 @@ exports.handler = async function(event, context) {
     } catch(error) {
         return {
             statusCode: 400,
-            body: String(error)
+            body: JSON.stringify(error.stack)
         }
     }
 }
