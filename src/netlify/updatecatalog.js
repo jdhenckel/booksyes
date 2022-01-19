@@ -123,21 +123,20 @@ function parseMultiPart(body, boundary) {
 
 
 
-async function initOrdersSheet() {
-    const doc = new GoogleSpreadsheet(process.env.DATABASE_ORDERS_KEY);
-
+async function initCatalogSheet() {
+    DUMMY = '1937173200';
+    const doc = new GoogleSpreadsheet(process.env.DATABASE_KEY);
     await doc.useServiceAccountAuth({
         client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
         private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
     });
     await doc.loadInfo();
-    const sheet = doc.sheetsById[process.env.DATABASE_SHEET_ORDERS];
-    await sheet.loadCells();
-    
+    const sheet = doc.sheetsById[DUMMY]; //process.env.DATABASE_SHEET_BOOKS];
+    await sheet.getRows();
     return sheet;
 }
 
-async function writeOrderToSheet(order, sheet) {
+async function writeCatalogToSheet(order, sheet) {
     //resize is 1-indexed
     await sheet.resize({ rowCount: sheet.rowCount + 1, columnCount: sheet.columnCount});
     
@@ -172,6 +171,8 @@ exports.handler = async function(event, context) {
 
         // TODO put newdata into the sheet
 
+        let sheet = await initCatalogSheet();
+
         return {
             statusCode: 200,
             body: JSON.stringify({
@@ -180,6 +181,7 @@ exports.handler = async function(event, context) {
                 method: event.httpMethod,
                 query: event.queryStringParameters,
                 path: event.path,
+                sheet: [sheet.title, sheet.rowCount]
             }),
         };
 
