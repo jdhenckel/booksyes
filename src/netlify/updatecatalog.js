@@ -65,7 +65,7 @@ function parseCatalog(lines) {
             continue;
         }
         // Try two matches, the first is more strict, the second more lenient
-        if (line.contains('$') && (
+        if (line.includes('$') && (
             (m = line.match(/^(.*?\. ) ([A-Z].*?\. ) (.*)(\$.*)$/)) ||
             (m = line.match(/^(.*?)([A-Z][A-Z].*?)( [A-Z]*[a-z].*)(\$.*)$/)))) {
             // BOOK
