@@ -1,5 +1,5 @@
-//called with /.netlify/functions/update catalog
-// modify the catalog
+
+const {GoogleSpreadsheet} = require('google-spreadsheet');
 
 //const helpers = require('./helperFuncs.js');
 
@@ -66,7 +66,7 @@ function parseCatalog(lines) {
         }
         // Try two matches, the first is more strict, the second more lenient
         if (line.includes('$') && (
-            (m = line.match(/^(.*?\. ) ([A-Z].*?\. ) (.*)(\$.*)$/)) ||
+            (m = line.match(/^(\S.*?\. ) ([A-Z].*?\. ) (.*)(\$.*)$/)) ||
             (m = line.match(/^(.*?)([A-Z][A-Z].*?)( [A-Z]*[a-z].*)(\$.*)$/)))) {
             // BOOK
             if (!line.startsWith('    ')) {   // End of Group
