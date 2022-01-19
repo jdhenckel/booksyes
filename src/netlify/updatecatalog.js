@@ -74,11 +74,11 @@ function parseCatalog(lines) {
         let pics = line.match(/ p=(\S+)/) || '';
         if (pics) {
             line = line.replace(/ p=\S+/,'');
-            pics = pics[0];
+            pics = pics[1];
             let u = pics.startsWith('i,');
             if (u) pics = pics.substring(2);
             pics = pics.split(',').map(i => 
-                IMAGE_URL[u]+i+(i.includes('.')?'':'.JPG')).join(',');
+                IMAGE_URL[+u]+i+(i.includes('.')?'':'.JPG')).join(',');
         }
 
         let isbn = line.match(/\d{9}[\dxX]/) || '';
