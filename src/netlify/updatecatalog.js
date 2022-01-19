@@ -56,6 +56,9 @@ function parseCatalog(lines) {
     let groupAuthor = '';
     let groupText = '';
     let groupSize = 0;
+    let IMAGE_URL = [
+        'http://i1103.photobucket.com/albums/g478/booksyes/',
+        'http://hosting.photobucket.com/albums/g478/booksyes/'];
 
     for (let line of lines) {
         if (line.trim()=='') continue;
@@ -64,6 +67,24 @@ function parseCatalog(lines) {
             category = line.trim();
             continue;
         }
+
+        let isNew = line.includes('<new>') ? 'new' : '';
+        if (isNew) line = line.replace('<new>','');
+
+        let pics = line.match(/ p=(\S+)/) || '';
+        if (pics) {
+            line = line.replace(/ p=\S+/,'');
+            let u = pics.startsWith('i,');
+            if (u) pics = pics.substring(2);
+            pics = pics.split(',').map(i => IMAGE_URL[u]+i).join(',');
+        }
+
+        let isbn = line.match(/\d{9}[\dxX]/) || '';
+        if (isbn) {
+            line.replace(/\d{9}[\dxX]/,'');
+            isbn = isbn[0];
+        }
+
         // Try two matches, the first is more strict, the second more lenient
         if (line.includes('$') && (
             (m = line.match(/^(\S.*?\. ) ([A-Z].*?\. ) (.*)(\$.*)$/)) ||
@@ -82,14 +103,15 @@ function parseCatalog(lines) {
                 group = groupText;
             }
             result.push({
-                author: author,
+                isNew,
+                author,
                 title:  m[2].trim(),
                 description: m[3].trim(),
                 price:  m[4].trim(),
-                //ISBN:   isbn,
-                //imageURLS: urls,
-                category: category,
-                group: group
+                ISBN:   isbn,
+                imageURLS: pics,
+                category,
+                group
             });
 
             // TODO - isbn ?   image URLS
@@ -136,9 +158,9 @@ async function initCatalogSheet() {
     return sheet;
 }
 
-async function writeCatalogToSheet(order, sheet) {
+async function writeCatalogToSheet(newdata, sheet) {
     //resize is 1-indexed
-    await sheet.resize({ rowCount: sheet.rowCount + 1, columnCount: sheet.columnCount});
+    await sheet.resize({ rowCount: newdata.length + 1, columnCount: 10});
     
     //load the newly created cells
     await sheet.loadCells();
@@ -171,7 +193,7 @@ exports.handler = async function(event, context) {
 
         // TODO put newdata into the sheet
 
-        let sheet = await initCatalogSheet();
+        //let sheet = await initCatalogSheet();
 
         return {
             statusCode: 200,
@@ -181,7 +203,7 @@ exports.handler = async function(event, context) {
                 method: event.httpMethod,
                 query: event.queryStringParameters,
                 path: event.path,
-                sheet: [sheet.title, sheet.rowCount]
+                //sheet: [sheet.title, sheet.rowCount, sheet.headerValues]
             }),
         };
 
