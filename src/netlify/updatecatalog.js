@@ -78,7 +78,7 @@ function parseCatalog(lines) {
             let u = pics.startsWith('i,');
             if (u) pics = pics.substring(2);
             pics = pics.split(',').map(i => 
-                IMAGE_URL[+u]+i+(i.includes('.')?'':'.JPG')).join(',');
+                IMAGE_URL[+u]+i+(i.includes('.')?'':'.JPG')).join(' ');
         }
 
         let isbn = line.match(/\d{9}[\dxX]/) || '';
