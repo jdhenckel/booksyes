@@ -53,10 +53,9 @@ function parseCatalog(lines) {
     let result = [];
     let errors = [];
     let category = '';
-    let book = {};
-    let group = {};
-    let groupid = 0;
-    let groupSize = 0;   // This is both counter and flag, 0 means no group is open.
+    let groupAuthor = '';
+    let groupText = '';
+    let groupSize = 0;
 
     for (let line of lines) {
         if (line.trim()=='') continue;
@@ -66,42 +65,39 @@ function parseCatalog(lines) {
             continue;
         }
         // Try two matches, the first is more strict, the second more lenient
-        if ((m = line.match(/^(.*?\. ) ([A-Z].*?\. ) (.*)(\$.*)$/)) ||
-            (m = line.match(/^(.*?)([A-Z][A-Z].*?)( [A-Z]*[a-z].*)(\$.*)$/))) {
-                // BOOK
-            indent = line.startsWith('    ');
-            if (!indent) {
+        if (line.contains('$') && (
+            (m = line.match(/^(.*?\. ) ([A-Z].*?\. ) (.*)(\$.*)$/)) ||
+            (m = line.match(/^(.*?)([A-Z][A-Z].*?)( [A-Z]*[a-z].*)(\$.*)$/)))) {
+            // BOOK
+            if (!line.startsWith('    ')) {   // End of Group
                 if (groupSize == 1)
-                    errors.push('The group has no books in it: ' + group.author);
+                    errors.push('The group has no books in it: ' + groupAuthor + ' ' + groupText);
                 groupSize = 0;
             } 
-            else if (groupSize) ++groupSize;
-            book = {
-                author: m[1].trim(),
+            author = m[1].trim();
+            group = '';
+            if (groupSize) {
+                ++groupSize;
+                author = author || groupAuthor;
+                group = groupText;
+            }
+            result.push({
+                author: author,
                 title:  m[2].trim(),
+                description: m[3].trim(),
                 price:  m[4].trim(),
                 //ISBN:   isbn,
-                description: m[3].trim(),
                 //imageURLS: urls,
                 category: category,
-                group: indent && groupSize ? groupid : '',
-            };
+                group: group
+            });
 
             // TODO - isbn ?   image URLS
-
-            result.push(book);
         }
         else if (m = line.match(/^(.*?\. ) (.*)$/)) {
-            // GROUP HEADING
-            ++groupid;
+            groupAuthor = m[1].trim();
+            groupText = m[2].trim();
             groupSize = 1;
-            group = {
-                author: m[1].trim(),
-                description: m[2].trim(),
-                category: category,
-                group: groupid,
-            };
-            result.push(group);
         }
         else {
             errors.push('Failed to parse: ' + line);
@@ -125,19 +121,56 @@ function parseMultiPart(body, boundary) {
 }
 
 
+
+
+async function initOrdersSheet() {
+    const doc = new GoogleSpreadsheet(process.env.DATABASE_ORDERS_KEY);
+
+    await doc.useServiceAccountAuth({
+        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+        private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+    });
+    await doc.loadInfo();
+    const sheet = doc.sheetsById[process.env.DATABASE_SHEET_ORDERS];
+    await sheet.loadCells();
+    
+    return sheet;
+}
+
+async function writeOrderToSheet(order, sheet) {
+    //resize is 1-indexed
+    await sheet.resize({ rowCount: sheet.rowCount + 1, columnCount: sheet.columnCount});
+    
+    //load the newly created cells
+    await sheet.loadCells();
+    
+    //getcell is 0-indexed
+    sheet.getCell(sheet.rowCount - 1, 0).value = JSON.stringify(order);
+    sheet.getCell(sheet.rowCount - 1, 2).value = order.orderNumber;
+
+    await sheet.saveUpdatedCells();
+    return;
+}
+
+
 exports.handler = async function(event, context) {
     try {
+
         let ctype = event.headers['content-type'];
         let cdata = parseValueList(ctype);
         if (!cdata['multipart/form-data'])
             throw new Error('content-type not correct: '+ctype);
         let body = Buffer.from(event.body,'base64').toString('utf8');
         let params = parseMultiPart(body, cdata.boundary);
-        if (params.password[0] !== 'xx') { // process.env.UPDATE_CATALOG_PASSWORD) {
-            throw Error('wrong password' + JSON.stringify(params).substring(0,200));
-        }
+        let password = params.password[0].trim();
+
+        // await bcrypt.compare(password, process.env.ORDER_REVIEW_HASH).then(result => {
+        //     if (result !== true) throw 'Incorrect Password';
+        // });
 
         let newdata = parseCatalog(params.bookdata);
+
+        // TODO put newdata into the sheet
 
         return {
             statusCode: 200,
